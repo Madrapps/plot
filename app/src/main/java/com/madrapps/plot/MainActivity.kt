@@ -35,8 +35,8 @@ private val dataPoints = listOf(
     DataPoint(10f,55f),
     DataPoint(11f,45f),
     DataPoint(12f,50f),
-    DataPoint(13f,100f),
-    DataPoint(14f,75f),
+    DataPoint(13f,80f),
+    DataPoint(14f,70f),
     DataPoint(15f,25f),
 )
 
@@ -85,9 +85,15 @@ fun LineGraph(dataPoints: List<DataPoint>) {
 
         var prevOffset: Offset? = null
         dataPoints.forEach { (x,y) ->
-            val x1 = x * fX
+            val x1 = (x * fX)
             val y1 = size.height - (y * fY)
-            drawCircle(Color.Blue, 10f, Offset(x1, y1))
+            val curOffset = Offset(x1, y1)
+            drawCircle(Color.Blue, 10f, curOffset)
+
+            if (prevOffset != null) {
+                drawLine(Color.Blue, prevOffset!!, curOffset, 5f)
+            }
+            prevOffset = curOffset
         }
     })
 
