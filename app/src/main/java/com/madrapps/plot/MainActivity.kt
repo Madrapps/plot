@@ -80,13 +80,16 @@ fun LineGraph(dataPoints: List<DataPoint>) {
             }
         }, onDraw = {
         drawCircle(color.value, radius = 100f, center = offset.value)
-        val fX = size.width / dataPoints.size
-        val fY = size.height / dataPoints.maxOf { it.y }
+        val xStart = 200
+        val yStart = 200
+        val fX = (size.width - 2*xStart) / dataPoints.size
+        val height = size.height - 2 * yStart
+        val fY = height / dataPoints.maxOf { it.y }
 
         var prevOffset: Offset? = null
         dataPoints.forEach { (x,y) ->
-            val x1 = (x * fX)
-            val y1 = size.height - (y * fY)
+            val x1 = (x * fX) + xStart
+            val y1 = height - (y * fY) + yStart
             val curOffset = Offset(x1, y1)
             drawCircle(Color.Blue, 10f, curOffset)
 
