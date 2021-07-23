@@ -26,6 +26,7 @@ import com.madrapps.plot.ui.theme.PlotTheme
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.withTimeout
 import kotlin.coroutines.cancellation.CancellationException
+import kotlin.math.abs
 
 private val dataPoints = listOf(
     DataPoint(0f, 0f),
@@ -76,6 +77,9 @@ fun LineGraph(dataPoints: List<DataPoint>) {
     val maxScrollOffset = remember { mutableStateOf(0f) }
     val dragOffset = remember { mutableStateOf(0f) }
     val isDragging = remember { mutableStateOf(false) }
+    val xZoom = remember {
+        mutableStateOf(1f)
+    }
     Canvas(modifier = Modifier
         .height(300.dp)
         .fillMaxWidth()
@@ -93,47 +97,28 @@ fun LineGraph(dataPoints: List<DataPoint>) {
         )
         .pointerInput(Unit, Unit) {
             Log.d("RONNY", "scope = $this")
-            detectDragGesturesAfterLongPress1(
-                onDragEnd = {
-                    isDragging.value = false
-                }, onDragStart = {
-                    dragOffset.value = it.x
-                    isDragging.value = true
-                }, onDragCancel = {
-                    isDragging.value = false
-                }) { change, _ ->
-                dragOffset.value = change.position.x
-            }
-//            forEachGesture {
-//                awaitPointerEventScope {
-//                    awaitFirstDown(requireUnconsumed = false)
-//                    do {
-//                        val event = awaitPointerEvent()
-//                        val canceled = event.changes.any { it.positionChangeConsumed() }
-//                        if (!canceled) {
-//                            val zoomChange = event.calculateZoom()
-//                        }
-//
-//                        if (event.changes.size == 1) {
-//                            Log.d("RONNY", "ONE")
-//                        } else if (event.changes.size == 2) {
-//                            Log.d("RONNY", "TWO")
-//                        } else {
-//                            Log.d("RONNY", "NONE")
-//                            break
-//                        }
-//                    } while (!canceled && event.changes.any { it.pressed })
-//                }
-//                Log.d("RONNY", "DONE")
+//            detectDragGesturesAfterLongPress1(
+//                onDragEnd = {
+//                    isDragging.value = false
+//                }, onDragStart = {
+//                    dragOffset.value = it.x
+//                    isDragging.value = true
+//                }, onDragCancel = {
+//                    isDragging.value = false
+//                }) { change, _ ->
+//                dragOffset.value = change.position.x
 //            }
-
+            detectTransformGestures1 { zoom ->
+                Log.d("RONNY", "Trans = $zoom")
+                xZoom.value *= zoom
+            }
         },
         onDraw = {
             val xStart = 30.dp.toPx()
             val yStart = 30.dp.toPx()
             val availableWidth = (size.width - xStart)
             val availableHeight = size.height - yStart
-            val xScale = 1f
+            val xScale = 1f * xZoom.value
             val yScale = 0.9f
             val xOffset = 30.dp.toPx()
             val yOffset = availableHeight / dataPoints.maxOf { it.y }
@@ -274,3 +259,45 @@ private suspend fun PointerInputScope.awaitLongPressOrCancellation(
 
 private fun PointerEvent.isPointerUp(pointerId: PointerId): Boolean =
     changes.firstOrNull { it.id == pointerId }?.pressed != true
+
+suspend fun PointerInputScope.detectTransformGestures1(
+    onGesture: (zoom: Float) -> Unit
+) {
+    forEachGesture {
+        awaitPointerEventScope {
+            var zoom = 1f
+            var pastTouchSlop = false
+            val touchSlop = viewConfiguration.touchSlop
+
+            awaitFirstDown(requireUnconsumed = false)
+            do {
+                val event = awaitPointerEvent()
+                val canceled = event.changes.any { it.positionChangeConsumed() }
+                if (!canceled) {
+                    val zoomChange = event.calculateZoom()
+                    if (!pastTouchSlop) {
+                        zoom *= zoomChange
+
+                        val centroidSize = event.calculateCentroidSize(useCurrent = false)
+                        val zoomMotion = abs(1 - zoom) * centroidSize
+
+                        if (zoomMotion > touchSlop) {
+                            pastTouchSlop = true
+                        }
+                    }
+
+                    if (pastTouchSlop) {
+                        if (zoomChange != 1f) {
+                            onGesture(zoomChange)
+                        }
+                        event.changes.forEach {
+                            if (it.positionChanged()) {
+                                it.consumeAllChanges()
+                            }
+                        }
+                    }
+                }
+            } while (!canceled && event.changes.any { it.pressed })
+        }
+    }
+}
