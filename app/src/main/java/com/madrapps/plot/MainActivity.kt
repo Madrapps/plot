@@ -5,7 +5,10 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.gestures.*
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
+import androidx.compose.foundation.gestures.rememberScrollableState
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -17,12 +20,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.madrapps.plot.ui.theme.PlotTheme
-import kotlin.system.measureTimeMillis
 
 private val dataPoints = listOf(
     DataPoint(0f, 0f),
@@ -70,8 +71,9 @@ fun LineGraph(dataPoints: List<DataPoint>) {
     val pointRadius = 6.dp
     val lineWidth = 3.dp
     val offset = remember { mutableStateOf(0f) }
-    val maxScrollOffset = remember { mutableStateOf(0f)}
-    Log.d("RONNY", "x = ")
+    val maxScrollOffset = remember { mutableStateOf(0f) }
+    val dragOffset = remember { mutableStateOf(0f) }
+    val isDragging = remember { mutableStateOf(false) }
     Canvas(modifier = Modifier
         .height(300.dp)
         .fillMaxWidth()
@@ -85,7 +87,21 @@ fun LineGraph(dataPoints: List<DataPoint>) {
                 delta
             }, Orientation.Horizontal, enabled = true,
             interactionSource = MutableInteractionSource()
-        ),
+        )
+        .pointerInput(Unit) {
+            detectDragGesturesAfterLongPress(
+                onDragEnd = {
+                    isDragging.value = false
+                }, onDragStart = {
+                    dragOffset.value = it.x
+                    isDragging.value = true
+                }, onDragCancel = {
+                    isDragging.value = false
+                }) { change, _ ->
+                Log.d("RONNY", "change = $change")
+                dragOffset.value = change.position.x
+            }
+        },
         onDraw = {
             val xStart = 30.dp.toPx()
             val yStart = 30.dp.toPx()
@@ -113,58 +129,13 @@ fun LineGraph(dataPoints: List<DataPoint>) {
                 }
                 prevOffset = curOffset
             }
-        })
-}
-
-@Composable
-fun LineGraphSample(dataPoints: List<DataPoint>) {
-    val color = remember { mutableStateOf(Color.Gray) }
-    val offset = remember {
-        mutableStateOf(Offset(0f, 0f))
-    }
-    val timeTaken = measureTimeMillis {
-        Canvas(modifier = Modifier
-            .height(300.dp)
-            .fillMaxWidth()
-            .pointerInput(Unit) {
-//            detectTapGestures(
-//                onDoubleTap = {
-//                    color.value = Color.Red
-//                },
-//                onLongPress = { color.value = Color.Green },
-//                onTap = { color.value = Color.Yellow },
-//                onPress = {
-//                    color.value = Color.Magenta
-//                }
-//            )
-                detectDragGestures { change, _ ->
-                    change.consumeAllChanges()
-                    offset.value = change.position
-                }
-            }, onDraw = {
-            drawCircle(color.value, radius = 100f, center = offset.value)
-            val xStart = 200
-            val yStart = 200
-            val fX = (size.width - 2 * xStart) / dataPoints.size
-            val height = size.height - 2 * yStart
-            val fY = height / dataPoints.maxOf { it.y }
-
-            var prevOffset: Offset? = null
-            dataPoints.forEach { (x, y) ->
-                val x1 = (x * fX) + xStart
-                val y1 = height - (y * fY) + yStart
-                val curOffset = Offset(x1, y1)
-                drawCircle(Color.Blue, 10f, curOffset)
-
-                if (prevOffset != null) {
-                    drawLine(Color.Blue, prevOffset!!, curOffset, 5f)
-                }
-                prevOffset = curOffset
+            if (isDragging.value) {
+                drawLine(
+                    Color.Red, Offset(dragOffset.value, 0f),
+                    Offset(dragOffset.value, availableHeight), lineWidth.toPx()
+                )
             }
         })
-    }
-    println("RONNY - TimeTaken = $timeTaken")
-
 }
 
 @Preview(showBackground = true)
