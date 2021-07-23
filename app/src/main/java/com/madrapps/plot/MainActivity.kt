@@ -96,21 +96,16 @@ fun LineGraph(dataPoints: List<DataPoint>) {
             interactionSource = MutableInteractionSource()
         )
         .pointerInput(Unit, Unit) {
-            Log.d("RONNY", "scope = $this")
-//            detectDragGesturesAfterLongPress1(
-//                onDragEnd = {
-//                    isDragging.value = false
-//                }, onDragStart = {
-//                    dragOffset.value = it.x
-//                    isDragging.value = true
-//                }, onDragCancel = {
-//                    isDragging.value = false
-//                }) { change, _ ->
-//                dragOffset.value = change.position.x
-//            }
-            detectTransformGestures1 { zoom ->
-                Log.d("RONNY", "Trans = $zoom")
-                xZoom.value *= zoom
+            detectDragZoomGesture(
+                onDragStart = {
+                    dragOffset.value = it.x
+                    isDragging.value = true
+                }, onDragEnd = {
+                    isDragging.value = false
+                }, onZoom = { zoom ->
+                    xZoom.value *= zoom
+                }) { change, _ ->
+                dragOffset.value = change.position.x
             }
         },
         onDraw = {
@@ -164,53 +159,12 @@ fun DefaultPreview() {
 
 data class DataPoint(val x: Float, val y: Float)
 
-suspend fun PointerInputScope.detectDragGesturesAfterLongPress1(
-    onDragStart: (Offset) -> Unit = { },
-    onDragEnd: () -> Unit = { },
-    onDragCancel: () -> Unit = { },
-    onDrag: (change: PointerInputChange, dragAmount: Offset) -> Unit
-) {
-    forEachGesture {
-        val down = awaitPointerEventScope {
-            awaitFirstDown(requireUnconsumed = false)
-        }
-        try {
-            val drag = awaitLongPressOrCancellation(down)
-            if (drag != null) {
-                onDragStart.invoke(drag.position)
-
-                awaitPointerEventScope {
-                    if (
-                        drag(drag.id) {
-                            onDrag(it, it.positionChange())
-                            it.consumePositionChange()
-                        }
-                    ) {
-                        // consume up if we quit drag gracefully with the up
-                        currentEvent.changes.forEach {
-                            if (it.changedToUp()) {
-                                it.consumeDownChange()
-                            }
-                        }
-                        onDragEnd()
-                    } else {
-                        onDragCancel()
-                    }
-                }
-            }
-        } catch (c: CancellationException) {
-            onDragCancel()
-            throw c
-        }
-    }
-}
-
-private suspend fun PointerInputScope.awaitLongPressOrCancellation(
+private suspend fun PointerInputScope.awaitLongPressOrCancellation1(
     initialDown: PointerInputChange
 ): PointerInputChange? {
     var longPress: PointerInputChange? = null
     var currentDown = initialDown
-    val longPressTimeout = 100L
+    val longPressTimeout = 50L
     return try {
         // wait for first tap up or long press
         withTimeout(longPressTimeout) {
@@ -260,44 +214,83 @@ private suspend fun PointerInputScope.awaitLongPressOrCancellation(
 private fun PointerEvent.isPointerUp(pointerId: PointerId): Boolean =
     changes.firstOrNull { it.id == pointerId }?.pressed != true
 
-suspend fun PointerInputScope.detectTransformGestures1(
-    onGesture: (zoom: Float) -> Unit
+suspend fun PointerInputScope.detectDragZoomGesture(
+    onDragStart: (Offset) -> Unit = { },
+    onDragEnd: () -> Unit = { },
+    onZoom: (zoom: Float) -> Unit,
+    onDrag: (change: PointerInputChange, dragAmount: Offset) -> Unit,
 ) {
     forEachGesture {
+        val down = awaitPointerEventScope {
+            awaitFirstDown(requireUnconsumed = false)
+        }
         awaitPointerEventScope {
             var zoom = 1f
             var pastTouchSlop = false
             val touchSlop = viewConfiguration.touchSlop
 
-            awaitFirstDown(requireUnconsumed = false)
             do {
                 val event = awaitPointerEvent()
                 val canceled = event.changes.any { it.positionChangeConsumed() }
-                if (!canceled) {
-                    val zoomChange = event.calculateZoom()
-                    if (!pastTouchSlop) {
-                        zoom *= zoomChange
+                Log.d("RONNY", "nextEV = $event")
+                if (event.changes.size == 1) {
+                    break
+                } else if (event.changes.size == 2) {
+                    if (!canceled) {
+                        val zoomChange = event.calculateZoom()
+                        if (!pastTouchSlop) {
+                            zoom *= zoomChange
 
-                        val centroidSize = event.calculateCentroidSize(useCurrent = false)
-                        val zoomMotion = abs(1 - zoom) * centroidSize
+                            val centroidSize = event.calculateCentroidSize(useCurrent = false)
+                            val zoomMotion = abs(1 - zoom) * centroidSize
 
-                        if (zoomMotion > touchSlop) {
-                            pastTouchSlop = true
+                            if (zoomMotion > touchSlop) {
+                                pastTouchSlop = true
+                            }
                         }
-                    }
 
-                    if (pastTouchSlop) {
-                        if (zoomChange != 1f) {
-                            onGesture(zoomChange)
-                        }
-                        event.changes.forEach {
-                            if (it.positionChanged()) {
-                                it.consumeAllChanges()
+                        if (pastTouchSlop) {
+                            if (zoomChange != 1f) {
+                                onZoom(zoomChange)
+                            }
+                            event.changes.forEach {
+                                if (it.positionChanged()) {
+                                    it.consumeAllChanges()
+                                }
                             }
                         }
                     }
+                } else {
+                    break
                 }
             } while (!canceled && event.changes.any { it.pressed })
+        }
+        try {
+            val drag = awaitLongPressOrCancellation1(down)
+            if (drag != null) {
+                onDragStart.invoke(drag.position)
+                awaitPointerEventScope {
+                    if (
+                        drag(drag.id) {
+                            onDrag(it, it.positionChange())
+                            it.consumePositionChange()
+                        }
+                    ) {
+                        // consume up if we quit drag gracefully with the up
+                        currentEvent.changes.forEach {
+                            if (it.changedToUp()) {
+                                it.consumeDownChange()
+                            }
+                        }
+                        onDragEnd()
+                    } else {
+                        onDragEnd()
+                    }
+                }
+            }
+        } catch (c: CancellationException) {
+            onDragEnd()
+            throw c
         }
     }
 }
