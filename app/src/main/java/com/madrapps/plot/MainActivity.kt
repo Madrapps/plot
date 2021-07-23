@@ -1,10 +1,12 @@
 package com.madrapps.plot
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.*
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.MaterialTheme
@@ -39,6 +41,14 @@ private val dataPoints = listOf(
     DataPoint(13f, 80f),
     DataPoint(14f, 70f),
     DataPoint(15f, 25f),
+    DataPoint(16f, 0f),
+    DataPoint(17f, 0f),
+    DataPoint(18f, 35f),
+    DataPoint(19f, 60f),
+    DataPoint(20f, 20f),
+    DataPoint(21f, 40f),
+    DataPoint(22f, 75f),
+    DataPoint(23f, 50f),
 )
 
 class MainActivity : ComponentActivity() {
@@ -59,9 +69,23 @@ class MainActivity : ComponentActivity() {
 fun LineGraph(dataPoints: List<DataPoint>) {
     val pointRadius = 6.dp
     val lineWidth = 3.dp
+    val offset = remember { mutableStateOf(0f) }
+    val maxScrollOffset = remember { mutableStateOf(0f)}
+    Log.d("RONNY", "x = ")
     Canvas(modifier = Modifier
         .height(300.dp)
-        .fillMaxWidth(),
+        .fillMaxWidth()
+        .scrollable(
+            state = rememberScrollableState { delta ->
+                offset.value -= delta
+                if (offset.value < 0f) offset.value = 0f
+                if (offset.value > maxScrollOffset.value) {
+                    offset.value = maxScrollOffset.value
+                }
+                delta
+            }, Orientation.Horizontal, enabled = true,
+            interactionSource = MutableInteractionSource()
+        ),
         onDraw = {
             val xStart = 30.dp.toPx()
             val yStart = 30.dp.toPx()
@@ -72,13 +96,18 @@ fun LineGraph(dataPoints: List<DataPoint>) {
             val xOffset = 30.dp.toPx()
             val yOffset = availableHeight / dataPoints.maxOf { it.y }
 
+            var scrollOffset = offset.value
             var prevOffset: Offset? = null
+            val xLastPoint = dataPoints.last().x * xOffset * xScale + xStart
+            if (xLastPoint > availableWidth) {
+                maxScrollOffset.value = xLastPoint - availableWidth
+            }
+
             dataPoints.forEach { (x, y) ->
-                val x1 = (x * xOffset*xScale) + xStart
-                val y1 = availableHeight - (y * yOffset*yScale)
+                val x1 = (x * xOffset * xScale) + xStart - scrollOffset
+                val y1 = availableHeight - (y * yOffset * yScale)
                 val curOffset = Offset(x1, y1)
                 drawCircle(Color.Blue, pointRadius.toPx(), curOffset)
-
                 if (prevOffset != null) {
                     drawLine(Color.Blue, prevOffset!!, curOffset, lineWidth.toPx())
                 }
