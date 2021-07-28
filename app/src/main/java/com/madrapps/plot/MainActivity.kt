@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -24,8 +23,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.madrapps.plot.ui.theme.Grey50
@@ -178,37 +175,9 @@ fun LineGraph(dataPoints: List<DataPoint>) {
         Modifier
             .height(300.dp)
             .width(90.dp)
-            .padding(start = 16.dp), 40 * 4f, globalYScale
-    ) {
-        (0..4).forEach {
-            Text(
-                text = "${it * 25}",
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                style = MaterialTheme.typography.caption
-            )
-        }
-    }
-}
-
-@Composable
-fun GraphColumn(modifier: Modifier, yStart: Float, yScale: Float, content: @Composable () -> Unit) {
-    Layout(content, modifier) { measurables, constraints ->
-        val placeables = measurables.map { measurable ->
-            measurable.measure(constraints.copy(minWidth = 0, minHeight = 0))
-        }
-        layout(constraints.maxWidth, constraints.maxHeight) {
-            val availableHeight = (constraints.maxHeight - yStart)
-            var yPosition = availableHeight.toInt()
-
-            placeables.forEach { placeable ->
-                yPosition -= (placeable.height / 2f).toInt() + 1
-                placeable.place(x = 0, y = yPosition)
-
-                yPosition -= (25 * availableHeight/100f * yScale).toInt() - (placeable.height / 2f).toInt()
-            }
-        }
-    }
+            .padding(start = 16.dp), 40 * 4f, globalYScale,
+        values = { listOf("", "25", "50", "75", "100") }
+    )
 }
 
 @Preview(showBackground = true)
