@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -173,6 +174,25 @@ fun LineGraph(dataPoints: List<DataPoint>) {
                 Offset(size.width - paddingRight.toPx(), 0f),
                 Size(paddingRight.toPx(), size.height)
             )
+
+            // Draw area under curve
+            val points = dataPoints.map { (x, y) ->
+                val x1 = (x * xOffset * xScale) + xStart - scrollOffset
+                val y1 = availableHeight - (y * yOffset * yScale)
+                Offset(x1, y1)
+            }
+            val p = Path()
+            points.forEachIndexed { index, offset ->
+                if (index == 0) {
+                    p.moveTo(offset.x, offset.y)
+                } else {
+                    p.lineTo(offset.x, offset.y)
+                }
+            }
+            val last = points.last()
+            val first = points.first()
+            p.lineTo(last.x, first.y)
+            drawPath(p, Color.Blue, 0.1f)
         })
     GraphColumn(
         Modifier
