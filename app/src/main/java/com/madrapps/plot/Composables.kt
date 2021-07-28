@@ -14,11 +14,11 @@ fun GraphColumn(
     yStart: Float,
     scale: Float,
     color: Color = MaterialTheme.colors.onSurface,
-    values: () -> List<String> = { listOf("0") },
+    values: () -> List<Value> = { listOf(Value("0", 0f)) },
     content: @Composable () -> Unit = {
-        values().forEach {
+        values().forEach { (text, _) ->
             Text(
-                text = it,
+                text = text,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 style = MaterialTheme.typography.caption,
@@ -44,3 +44,5 @@ fun GraphColumn(
         }
     }
 }
+
+data class Value(val text: String, val value: Float)
