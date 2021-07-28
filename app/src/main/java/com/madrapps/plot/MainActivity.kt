@@ -174,60 +174,38 @@ fun LineGraph(dataPoints: List<DataPoint>) {
                 Size(paddingRight.toPx(), size.height)
             )
         })
-    MyLayout(
+    GraphColumn(
         Modifier
             .height(300.dp)
             .width(90.dp)
             .padding(start = 16.dp), 40 * 4f, globalYScale
     ) {
-
-        Text(
-            text = "0",
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            style = MaterialTheme.typography.caption
-        )
-        Text(
-            text = "25",
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            style = MaterialTheme.typography.caption
-        )
-        Text(
-            text = "50",
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            style = MaterialTheme.typography.caption
-        )
-        Text(
-            text = "75",
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            style = MaterialTheme.typography.caption
-        )
-        Text(
-            text = "100",
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            style = MaterialTheme.typography.caption
-        )
+        (0..4).forEach {
+            Text(
+                text = "${it * 25}",
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.caption
+            )
+        }
     }
 }
 
 @Composable
-fun MyLayout(modifier: Modifier, yStart: Float, yScale: Float, content: @Composable () -> Unit) {
+fun GraphColumn(modifier: Modifier, yStart: Float, yScale: Float, content: @Composable () -> Unit) {
     Layout(content, modifier) { measurables, constraints ->
         val placeables = measurables.map { measurable ->
             measurable.measure(constraints.copy(minWidth = 0, minHeight = 0))
         }
         layout(constraints.maxWidth, constraints.maxHeight) {
-            var yPosition = (constraints.maxHeight - yStart).toInt()
+            val availableHeight = (constraints.maxHeight - yStart)
+            var yPosition = availableHeight.toInt()
 
             placeables.forEach { placeable ->
                 yPosition -= (placeable.height / 2f).toInt() + 1
                 placeable.place(x = 0, y = yPosition)
 
-                yPosition -= (25 * 10.4f * yScale).toInt() - (placeable.height / 2f).toInt()
+                yPosition -= (25 * availableHeight/100f * yScale).toInt() - (placeable.height / 2f).toInt()
             }
         }
     }
