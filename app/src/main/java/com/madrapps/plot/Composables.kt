@@ -7,11 +7,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 
 @Composable
 fun GraphColumn(
     modifier: Modifier,
-    yStart: Float,
+    yStart: Dp,
     scale: Float,
     color: Color = MaterialTheme.colors.onSurface,
     values: () -> List<Value> = { listOf(Value("0", 0f)) },
@@ -40,7 +41,7 @@ fun GraphColumn(
             measurable.measure(constraints.copy(minWidth = 0, minHeight = 0))
         }
         layout(constraints.maxWidth, constraints.maxHeight) {
-            val availableHeight = (constraints.maxHeight - yStart)
+            val availableHeight = (constraints.maxHeight - yStart.toPx())
             var yPos = availableHeight.toInt()
 
             placeables.forEach { placeable ->

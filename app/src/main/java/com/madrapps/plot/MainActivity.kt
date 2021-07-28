@@ -85,6 +85,9 @@ fun LineGraph(dataPoints: List<DataPoint>) {
 
     val globalYScale = 0.9f
 
+    val rowOffset = 40.dp
+    val columnOffset = 30.dp
+
     Canvas(modifier = Modifier
         .height(300.dp)
         .fillMaxWidth()
@@ -114,13 +117,13 @@ fun LineGraph(dataPoints: List<DataPoint>) {
             }
         },
         onDraw = {
-            val xStart = 30.dp.toPx() + paddingLeft.toPx()
-            val yStart = 40.dp.toPx()
+            val xStart = columnOffset.toPx() + paddingLeft.toPx()
+            val yStart = rowOffset.toPx()
             val availableWidth = (size.width - xStart)
             val availableHeight = size.height - yStart
             val xScale = 1f * xZoom.value
             val yScale = globalYScale
-            val xOffset = 30.dp.toPx()
+            val xOffset = 20.dp.toPx()
             val yOffset = availableHeight / dataPoints.maxOf { it.y }
 
             var scrollOffset = offset.value
@@ -175,7 +178,7 @@ fun LineGraph(dataPoints: List<DataPoint>) {
         Modifier
             .height(300.dp)
             .width(90.dp)
-            .padding(start = 16.dp), 40 * 4f, globalYScale,
+            .padding(start = 16.dp), rowOffset, globalYScale,
         values = {
             (0..10).map {
                 val v = it * 10f
