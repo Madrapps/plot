@@ -27,19 +27,26 @@ fun GraphColumn(
         }
     }
 ) {
+    val valueList = values()
+    val steps = valueList.size - 1
+    val min = valueList.first().value
+    val max = valueList.last().value
+    val stepSize = if (steps != 0) {
+        (max - min) / steps
+    } else 0f
+
     Layout(content, modifier) { measurables, constraints ->
         val placeables = measurables.map { measurable ->
             measurable.measure(constraints.copy(minWidth = 0, minHeight = 0))
         }
         layout(constraints.maxWidth, constraints.maxHeight) {
             val availableHeight = (constraints.maxHeight - yStart)
-            var yPosition = availableHeight.toInt()
+            var yPos = availableHeight.toInt()
 
             placeables.forEach { placeable ->
-                yPosition -= (placeable.height / 2f).toInt() + 1
-                placeable.place(x = 0, y = yPosition)
-
-                yPosition -= (25 * availableHeight / 100f * scale).toInt() - (placeable.height / 2f).toInt()
+                yPos -= (placeable.height / 2f).toInt() + 1
+                placeable.place(x = 0, y = yPos)
+                yPos -= (stepSize * availableHeight / max * scale).toInt() - (placeable.height / 2f).toInt()
             }
         }
     }

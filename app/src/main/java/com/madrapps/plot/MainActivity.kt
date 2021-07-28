@@ -177,8 +177,8 @@ fun LineGraph(dataPoints: List<DataPoint>) {
             .width(90.dp)
             .padding(start = 16.dp), 40 * 4f, globalYScale,
         values = {
-            (0..4).map {
-                val v = it * 25f
+            (0..10).map {
+                val v = it * 10f
                 Value(v.toInt().toString(), v)
             }
         }
