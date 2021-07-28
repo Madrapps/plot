@@ -78,6 +78,9 @@ fun LineGraph(dataPoints: List<DataPoint>) {
     val xZoom = remember {
         mutableStateOf(1f)
     }
+    val paddingRight = 16.dp
+    val paddingLeft = 16.dp
+
     Canvas(modifier = Modifier
         .height(300.dp)
         .fillMaxWidth()
@@ -107,7 +110,7 @@ fun LineGraph(dataPoints: List<DataPoint>) {
             }
         },
         onDraw = {
-            val xStart = 40.dp.toPx()
+            val xStart = 30.dp.toPx() + paddingLeft.toPx()
             val yStart = 40.dp.toPx()
             val availableWidth = (size.width - xStart)
             val availableHeight = size.height - yStart
@@ -147,6 +150,9 @@ fun LineGraph(dataPoints: List<DataPoint>) {
 
             // Draw column
             drawRect(Grey50, Offset(0f, 0f), Size(xStart - pointRadius.toPx(), size.height))
+
+            // Draw right padding
+            drawRect(Grey50, Offset(size.width-paddingRight.toPx(),0f), Size(paddingRight.toPx(), size.height))
         })
 }
 
