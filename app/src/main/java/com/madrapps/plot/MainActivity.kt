@@ -126,6 +126,15 @@ fun LineGraph(dataPoints: List<DataPoint>) {
                 maxScrollOffset.value = xLastPoint - availableWidth
             }
             var xLock = 0f
+
+            // Draw Grid (horizontal lines for every 25 points in Y
+            (0..4).forEach {
+                val y = it * 25f
+                val y1 = availableHeight - (y * yOffset * yScale)
+                drawLine(Color.Black, Offset(xStart,y1), Offset(size.width, y1), 1.dp.toPx())
+            }
+
+            // Draw Points and Lines
             dataPoints.forEach { (x, y) ->
                 val x1 = (x * xOffset * xScale) + xStart - scrollOffset
                 val y1 = availableHeight - (y * yOffset * yScale)
@@ -152,7 +161,11 @@ fun LineGraph(dataPoints: List<DataPoint>) {
             drawRect(Grey50, Offset(0f, 0f), Size(xStart - pointRadius.toPx(), size.height))
 
             // Draw right padding
-            drawRect(Grey50, Offset(size.width-paddingRight.toPx(),0f), Size(paddingRight.toPx(), size.height))
+            drawRect(
+                Grey50,
+                Offset(size.width - paddingRight.toPx(), 0f),
+                Size(paddingRight.toPx(), size.height)
+            )
         })
 }
 
