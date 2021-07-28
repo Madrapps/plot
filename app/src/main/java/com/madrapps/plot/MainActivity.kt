@@ -11,8 +11,11 @@ import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -21,6 +24,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.madrapps.plot.ui.theme.Grey50
@@ -81,6 +86,8 @@ fun LineGraph(dataPoints: List<DataPoint>) {
     val paddingRight = 16.dp
     val paddingLeft = 16.dp
 
+    val globalYScale = 0.9f
+
     Canvas(modifier = Modifier
         .height(300.dp)
         .fillMaxWidth()
@@ -115,7 +122,7 @@ fun LineGraph(dataPoints: List<DataPoint>) {
             val availableWidth = (size.width - xStart)
             val availableHeight = size.height - yStart
             val xScale = 1f * xZoom.value
-            val yScale = 0.9f
+            val yScale = globalYScale
             val xOffset = 30.dp.toPx()
             val yOffset = availableHeight / dataPoints.maxOf { it.y }
 
@@ -131,7 +138,7 @@ fun LineGraph(dataPoints: List<DataPoint>) {
             (0..4).forEach {
                 val y = it * 25f
                 val y1 = availableHeight - (y * yOffset * yScale)
-                drawLine(Color.Black, Offset(xStart,y1), Offset(size.width, y1), 1.dp.toPx())
+                drawLine(Color.Black, Offset(xStart, y1), Offset(size.width, y1), 1.dp.toPx())
             }
 
             // Draw Points and Lines
@@ -167,6 +174,63 @@ fun LineGraph(dataPoints: List<DataPoint>) {
                 Size(paddingRight.toPx(), size.height)
             )
         })
+    MyLayout(
+        Modifier
+            .height(300.dp)
+            .width(90.dp)
+            .padding(start = 16.dp), 40 * 4f, globalYScale
+    ) {
+
+        Text(
+            text = "0",
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            style = MaterialTheme.typography.caption
+        )
+        Text(
+            text = "25",
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            style = MaterialTheme.typography.caption
+        )
+        Text(
+            text = "50",
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            style = MaterialTheme.typography.caption
+        )
+        Text(
+            text = "75",
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            style = MaterialTheme.typography.caption
+        )
+        Text(
+            text = "100",
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            style = MaterialTheme.typography.caption
+        )
+    }
+}
+
+@Composable
+fun MyLayout(modifier: Modifier, yStart: Float, yScale: Float, content: @Composable () -> Unit) {
+    Layout(content, modifier) { measurables, constraints ->
+        val placeables = measurables.map { measurable ->
+            measurable.measure(constraints.copy(minWidth = 0, minHeight = 0))
+        }
+        layout(constraints.maxWidth, constraints.maxHeight) {
+            var yPosition = (constraints.maxHeight - yStart).toInt()
+
+            placeables.forEach { placeable ->
+                yPosition -= (placeable.height / 2f).toInt() + 1
+                placeable.place(x = 0, y = yPosition)
+
+                yPosition -= (25 * 10.4f * yScale).toInt() - (placeable.height / 2f).toInt()
+            }
+        }
+    }
 }
 
 @Preview(showBackground = true)
