@@ -243,16 +243,6 @@ fun LineGraph(dataPoints: List<DataPoint>) {
     }
 }
 
-class RowClip(private val offset: Dp) : Shape {
-    override fun createOutline(
-        size: Size,
-        layoutDirection: LayoutDirection,
-        density: Density
-    ): Outline {
-        return Outline.Rectangle(Rect(offset.value * density.density, 0f, size.width, size.height))
-    }
-}
-
 @Composable
 fun GraphRow(
     modifier: Modifier,
