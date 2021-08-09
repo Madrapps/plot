@@ -92,7 +92,7 @@ fun LineGraph(dataPoints: List<DataPoint>) {
 
     val globalYScale = 0.9f
 
-    val rowOffset = 40.dp
+    val rowOffset = 60.dp
     val columnOffset = 30.dp
     CompositionLocalProvider(
         LocalLayoutDirection provides LayoutDirection.Ltr,
@@ -226,20 +226,41 @@ fun LineGraph(dataPoints: List<DataPoint>) {
                     }
                 }
             )
+            val values = {
+                (0..23).map {
+                    val v = it.toFloat()
+                    Value(v.toInt().toString(), v)
+                }
+            }
             GraphRow(
                 Modifier
                     .align(Alignment.BottomStart)
                     .fillMaxWidth()
-                    .height(30.dp)
-                    .clip(RowClip(columnOffset + paddingLeft - pointRadius)), columnOffset + paddingLeft, 1f*xZoom.value,
-                values = {
-                    (0..10).map {
-                        val v = it.toFloat()
-                        Value(v.toInt().toString(), v)
-                    }
-                },
+                    .height(50.dp)
+                    .clip(RowClip(columnOffset + paddingLeft - pointRadius)),
+                columnOffset + paddingLeft,
+                offset.value,
+                1f * xZoom.value,
+                values = values,
                 stepSize = 20.dp
-            )
+            ) {
+                values().forEach { (text, i) ->
+                    val color = MaterialTheme.colors.onSurface
+                    Column() {
+                        val radius = if (i.toInt() % 4 == 0) 20f else 10f
+                        Canvas(modifier = Modifier.align(Alignment.CenterHorizontally).height(20.dp), onDraw = {
+                            drawCircle(color = color, radius, Offset(0f, 40f))
+                        })
+                        Text(
+                            text = text,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            style = MaterialTheme.typography.caption,
+                            color = MaterialTheme.colors.onSurface
+                        )
+                    }
+                }
+            }
         }
     }
 }
@@ -248,6 +269,7 @@ fun LineGraph(dataPoints: List<DataPoint>) {
 fun GraphRow(
     modifier: Modifier,
     xStart: Dp,
+    scrollOffset: Float,
     scale: Float,
     color: Color = MaterialTheme.colors.onSurface,
     values: () -> List<Value> = { listOf(Value("0", 0f)) },
@@ -264,19 +286,13 @@ fun GraphRow(
         }
     }
 ) {
-    val valueList = values()
-    val steps = valueList.size - 1
-    val min = valueList.first().value
-    val max = valueList.last().value
-
     Layout(content, modifier) { measurables, constraints ->
         val placeables = measurables.map { measurable ->
             measurable.measure(constraints.copy(minWidth = 0, minHeight = 0))
         }
         layout(constraints.maxWidth, constraints.maxHeight) {
-            val availableWidth = (constraints.maxWidth - xStart.toPx())
-            var xPos = xStart.toPx().toInt()
-            var step = stepSize.toPx()
+            var xPos = (xStart.toPx() - scrollOffset).toInt()
+            val step = stepSize.toPx()
             placeables.forEach { placeable ->
                 xPos -= (placeable.width / 2f).toInt()
                 placeable.place(x = xPos, y = 0)
