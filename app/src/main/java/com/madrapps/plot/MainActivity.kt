@@ -25,11 +25,9 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.madrapps.plot.ui.theme.Grey50
@@ -67,7 +65,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             PlotTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(color = MaterialTheme.colors.background) {
                     LineGraph(dataPoints)
                 }
@@ -141,7 +138,6 @@ fun LineGraph(dataPoints: List<DataPoint>) {
                     val xOffset = 20.dp.toPx()
                     val yOffset = availableHeight / dataPoints.maxOf { it.y }
 
-                    var scrollOffset = offset.value
                     var prevOffset: Offset? = null
                     val xLastPoint = dataPoints.last().x * xOffset * xScale + xStart
                     if (xLastPoint > availableWidth) {
@@ -163,7 +159,7 @@ fun LineGraph(dataPoints: List<DataPoint>) {
 
                     // Draw Points and Lines
                     dataPoints.forEach { (x, y) ->
-                        val x1 = (x * xOffset * xScale) + xStart - scrollOffset
+                        val x1 = (x * xOffset * xScale) + xStart - offset.value
                         val y1 = availableHeight - (y * yOffset * yScale)
                         val curOffset = Offset(x1, y1)
                         val color =
@@ -196,7 +192,7 @@ fun LineGraph(dataPoints: List<DataPoint>) {
 
                     // Draw area under curve
                     val points = dataPoints.map { (x, y) ->
-                        val x1 = (x * xOffset * xScale) + xStart - scrollOffset
+                        val x1 = (x * xOffset * xScale) + xStart - offset.value
                         val y1 = availableHeight - (y * yOffset * yScale)
                         Offset(x1, y1)
                     }
@@ -220,8 +216,8 @@ fun LineGraph(dataPoints: List<DataPoint>) {
                     .width(90.dp)
                     .padding(start = 16.dp), rowOffset, globalYScale,
                 values = {
-                    (0..10).map {
-                        val v = it * 10f
+                    (0..4).map {
+                        val v = it * 25f
                         Value(v.toInt().toString(), v)
                     }
                 }
@@ -247,61 +243,30 @@ fun LineGraph(dataPoints: List<DataPoint>) {
                 values().forEach { (text, i) ->
                     val color = MaterialTheme.colors.onSurface
                     Column() {
-                        val radius = if (i.toInt() % 4 == 0) 20f else 10f
-                        Canvas(modifier = Modifier.align(Alignment.CenterHorizontally).height(20.dp), onDraw = {
-                            drawCircle(color = color, radius, Offset(0f, 40f))
-                        })
-                        Text(
-                            text = text,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            style = MaterialTheme.typography.caption,
-                            color = MaterialTheme.colors.onSurface
-                        )
+                        val isMajor = i.toInt() % 4 == 0
+                        val radius = if (isMajor) 20f else 10f
+                        Canvas(
+                            modifier = Modifier
+                                .align(Alignment.CenterHorizontally)
+                                .height(20.dp),
+                            onDraw = {
+                                drawCircle(color = color, radius, Offset(0f, 40f))
+                            })
+                        if (isMajor) {
+                            Text(
+                                text = text,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                style = MaterialTheme.typography.caption,
+                                color = MaterialTheme.colors.onSurface
+                            )
+                        }
                     }
                 }
             }
         }
     }
 }
-
-@Composable
-fun GraphRow(
-    modifier: Modifier,
-    xStart: Dp,
-    scrollOffset: Float,
-    scale: Float,
-    color: Color = MaterialTheme.colors.onSurface,
-    values: () -> List<Value> = { listOf(Value("0", 0f)) },
-    stepSize: Dp,
-    content: @Composable () -> Unit = {
-        values().forEach { (text, _) ->
-            Text(
-                text = text,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                style = MaterialTheme.typography.caption,
-                color = color
-            )
-        }
-    }
-) {
-    Layout(content, modifier) { measurables, constraints ->
-        val placeables = measurables.map { measurable ->
-            measurable.measure(constraints.copy(minWidth = 0, minHeight = 0))
-        }
-        layout(constraints.maxWidth, constraints.maxHeight) {
-            var xPos = (xStart.toPx() - scrollOffset).toInt()
-            val step = stepSize.toPx()
-            placeables.forEach { placeable ->
-                xPos -= (placeable.width / 2f).toInt()
-                placeable.place(x = xPos, y = 0)
-                xPos += ((step * scale) + (placeable.width / 2f)).toInt()
-            }
-        }
-    }
-}
-
 
 @Preview(showBackground = true)
 @Composable

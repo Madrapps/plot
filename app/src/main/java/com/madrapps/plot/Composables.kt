@@ -53,4 +53,42 @@ fun GraphColumn(
     }
 }
 
+
+@Composable
+fun GraphRow(
+    modifier: Modifier,
+    xStart: Dp,
+    scrollOffset: Float,
+    scale: Float,
+    color: Color = MaterialTheme.colors.onSurface,
+    values: () -> List<Value> = { listOf(Value("0", 0f)) },
+    stepSize: Dp,
+    content: @Composable () -> Unit = {
+        values().forEach { (text, _) ->
+            Text(
+                text = text,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.caption,
+                color = color
+            )
+        }
+    }
+) {
+    Layout(content, modifier) { measurables, constraints ->
+        val placeables = measurables.map { measurable ->
+            measurable.measure(constraints.copy(minWidth = 0, minHeight = 0))
+        }
+        layout(constraints.maxWidth, constraints.maxHeight) {
+            var xPos = (xStart.toPx() - scrollOffset).toInt()
+            val step = stepSize.toPx()
+            placeables.forEach { placeable ->
+                xPos -= (placeable.width / 2f).toInt()
+                placeable.place(x = xPos, y = 0)
+                xPos += ((step * scale) + (placeable.width / 2f)).toInt()
+            }
+        }
+    }
+}
+
 data class Value(val text: String, val value: Float)
