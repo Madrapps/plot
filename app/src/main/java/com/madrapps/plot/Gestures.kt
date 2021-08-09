@@ -10,82 +10,92 @@ import kotlin.coroutines.cancellation.CancellationException
 import kotlin.math.abs
 
 suspend fun PointerInputScope.detectDragZoomGesture(
+    isZoomAllowed: Boolean = false,
+    isDragAllowed: Boolean = true,
     onDragStart: (Offset) -> Unit = { },
     onDragEnd: () -> Unit = { },
     onZoom: (zoom: Float) -> Unit,
     onDrag: (change: PointerInputChange, dragAmount: Offset) -> Unit,
 ) {
-    forEachGesture {
-        val down = awaitPointerEventScope {
-            awaitFirstDown(requireUnconsumed = false)
-        }
-        awaitPointerEventScope {
-            var zoom = 1f
-            var pastTouchSlop = false
-            val touchSlop = viewConfiguration.touchSlop
+    if (isDragAllowed || isZoomAllowed) {
+        forEachGesture {
+            val down = awaitPointerEventScope {
+                awaitFirstDown(requireUnconsumed = false)
+            }
+            awaitPointerEventScope {
+                var zoom = 1f
+                var pastTouchSlop = false
+                val touchSlop = viewConfiguration.touchSlop
 
-            do {
-                val event = awaitPointerEvent()
-                val canceled = event.changes.any { it.positionChangeConsumed() }
-                Log.d("RONNY", "nextEV = $event")
-                if (event.changes.size == 1) {
-                    break
-                } else if (event.changes.size == 2) {
-                    if (!canceled) {
-                        val zoomChange = event.calculateZoom()
-                        if (!pastTouchSlop) {
-                            zoom *= zoomChange
+                do {
+                    val event = awaitPointerEvent()
+                    val canceled = event.changes.any { it.positionChangeConsumed() }
+                    Log.d("RONNY", "nextEV = $event")
+                    if (event.changes.size == 1) {
+                        break
+                    } else if (event.changes.size == 2) {
+                        if (isZoomAllowed) {
+                            if (!canceled) {
+                                val zoomChange = event.calculateZoom()
+                                if (!pastTouchSlop) {
+                                    zoom *= zoomChange
 
-                            val centroidSize = event.calculateCentroidSize(useCurrent = false)
-                            val zoomMotion = abs(1 - zoom) * centroidSize
+                                    val centroidSize =
+                                        event.calculateCentroidSize(useCurrent = false)
+                                    val zoomMotion = abs(1 - zoom) * centroidSize
 
-                            if (zoomMotion > touchSlop) {
-                                pastTouchSlop = true
-                            }
-                        }
+                                    if (zoomMotion > touchSlop) {
+                                        pastTouchSlop = true
+                                    }
+                                }
 
-                        if (pastTouchSlop) {
-                            if (zoomChange != 1f) {
-                                onZoom(zoomChange)
-                            }
-                            event.changes.forEach {
-                                if (it.positionChanged()) {
-                                    it.consumeAllChanges()
+                                if (pastTouchSlop) {
+                                    if (zoomChange != 1f) {
+                                        onZoom(zoomChange)
+                                    }
+                                    event.changes.forEach {
+                                        if (it.positionChanged()) {
+                                            it.consumeAllChanges()
+                                        }
+                                    }
                                 }
                             }
                         }
+                    } else {
+                        break
                     }
-                } else {
-                    break
-                }
-            } while (!canceled && event.changes.any { it.pressed })
-        }
-        try {
-            val drag = awaitLongPressOrCancellation1(down)
-            if (drag != null) {
-                onDragStart.invoke(drag.position)
-                awaitPointerEventScope {
-                    if (
-                        drag(drag.id) {
-                            onDrag(it, it.positionChange())
-                            it.consumePositionChange()
-                        }
-                    ) {
-                        // consume up if we quit drag gracefully with the up
-                        currentEvent.changes.forEach {
-                            if (it.changedToUp()) {
-                                it.consumeDownChange()
+                } while (!canceled && event.changes.any { it.pressed })
+            }
+
+            if (isDragAllowed) {
+                try {
+                    val drag = awaitLongPressOrCancellation1(down)
+                    if (drag != null) {
+                        onDragStart.invoke(drag.position)
+                        awaitPointerEventScope {
+                            if (
+                                drag(drag.id) {
+                                    onDrag(it, it.positionChange())
+                                    it.consumePositionChange()
+                                }
+                            ) {
+                                // consume up if we quit drag gracefully with the up
+                                currentEvent.changes.forEach {
+                                    if (it.changedToUp()) {
+                                        it.consumeDownChange()
+                                    }
+                                }
+                                onDragEnd()
+                            } else {
+                                onDragEnd()
                             }
                         }
-                        onDragEnd()
-                    } else {
-                        onDragEnd()
                     }
+                } catch (c: CancellationException) {
+                    onDragEnd()
+                    throw c
                 }
             }
-        } catch (c: CancellationException) {
-            onDragEnd()
-            throw c
         }
     }
 }

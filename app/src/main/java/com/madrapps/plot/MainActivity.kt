@@ -30,7 +30,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import com.madrapps.plot.ui.theme.Grey50
 import com.madrapps.plot.ui.theme.PlotTheme
 
 private val dataPoints = listOf(
@@ -65,7 +64,12 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             PlotTheme {
-                Surface(color = MaterialTheme.colors.background) {
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(300.dp),
+                    color = MaterialTheme.colors.background
+                ) {
                     LineGraph(dataPoints)
                 }
             }
@@ -75,35 +79,43 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun LineGraph(dataPoints: List<DataPoint>) {
+    // Graph Line properties
     val pointRadius = 6.dp
     val lineWidth = 3.dp
+
+    // Overall Graph properties
+    val paddingLeft = 16.dp
+    val paddingRight = 16.dp
+    val globalXScale = 1f
+    val globalYScale = 0.9f
+    val rowOffset = 60.dp
+    val columnOffset = 30.dp
+    val rowHeight = 50.dp
+    val columnWidth = 90.dp
+    val bgColor = MaterialTheme.colors.surface
+
     val offset = remember { mutableStateOf(0f) }
     val maxScrollOffset = remember { mutableStateOf(0f) }
     val dragOffset = remember { mutableStateOf(0f) }
     val isDragging = remember { mutableStateOf(false) }
-    val xZoom = remember {
-        mutableStateOf(1f)
-    }
-    val paddingRight = 16.dp
-    val paddingLeft = 16.dp
+    val xZoom = remember { mutableStateOf(globalXScale) }
 
-    val globalYScale = 0.9f
+    val isZoomAllowed = false
+    val isDragAllowed = true
 
-    val rowOffset = 60.dp
-    val columnOffset = 30.dp
     CompositionLocalProvider(
         LocalLayoutDirection provides LayoutDirection.Ltr,
     ) {
         Box(
             modifier = Modifier
-                .height(300.dp)
+                .fillMaxHeight()
                 .fillMaxWidth()
         ) {
             Canvas(modifier = Modifier
                 .align(Alignment.Center)
                 .fillMaxHeight()
                 .fillMaxWidth()
-                .background(Grey50)
+                .background(bgColor)
                 .scrollable(
                     state = rememberScrollableState { delta ->
                         offset.value -= delta
@@ -117,6 +129,8 @@ fun LineGraph(dataPoints: List<DataPoint>) {
                 )
                 .pointerInput(Unit, Unit) {
                     detectDragZoomGesture(
+                        isDragAllowed = isDragAllowed,
+                        isZoomAllowed = isZoomAllowed,
                         onDragStart = {
                             dragOffset.value = it.x
                             isDragging.value = true
@@ -134,7 +148,6 @@ fun LineGraph(dataPoints: List<DataPoint>) {
                     val availableWidth = (size.width - xStart)
                     val availableHeight = size.height - yStart
                     val xScale = 1f * xZoom.value
-                    val yScale = globalYScale
                     val xOffset = 20.dp.toPx()
                     val yOffset = availableHeight / dataPoints.maxOf { it.y }
 
@@ -148,7 +161,7 @@ fun LineGraph(dataPoints: List<DataPoint>) {
                     // Draw Grid (horizontal lines for every 25 points in Y
                     (0..4).forEach {
                         val y = it * 25f
-                        val y1 = availableHeight - (y * yOffset * yScale)
+                        val y1 = availableHeight - (y * yOffset * globalYScale)
                         drawLine(
                             Color.Black,
                             Offset(xStart, y1),
@@ -160,7 +173,7 @@ fun LineGraph(dataPoints: List<DataPoint>) {
                     // Draw Points and Lines
                     dataPoints.forEach { (x, y) ->
                         val x1 = (x * xOffset * xScale) + xStart - offset.value
-                        val y1 = availableHeight - (y * yOffset * yScale)
+                        val y1 = availableHeight - (y * yOffset * globalYScale)
                         val curOffset = Offset(x1, y1)
                         val color =
                             if (isDragging.value && (dragOffset.value) > x1 - (xOffset * xScale) / 2 && (dragOffset.value) < x1 + (xOffset * xScale) / 2) {
@@ -181,11 +194,15 @@ fun LineGraph(dataPoints: List<DataPoint>) {
                     }
 
                     // Draw column
-                    drawRect(Grey50, Offset(0f, 0f), Size(xStart - pointRadius.toPx(), size.height))
+                    drawRect(
+                        bgColor,
+                        Offset(0f, 0f),
+                        Size(xStart - pointRadius.toPx(), size.height)
+                    )
 
                     // Draw right padding
                     drawRect(
-                        Grey50,
+                        bgColor,
                         Offset(size.width - paddingRight.toPx(), 0f),
                         Size(paddingRight.toPx(), size.height)
                     )
@@ -193,7 +210,7 @@ fun LineGraph(dataPoints: List<DataPoint>) {
                     // Draw area under curve
                     val points = dataPoints.map { (x, y) ->
                         val x1 = (x * xOffset * xScale) + xStart - offset.value
-                        val y1 = availableHeight - (y * yOffset * yScale)
+                        val y1 = availableHeight - (y * yOffset * globalYScale)
                         Offset(x1, y1)
                     }
                     val p = Path()
@@ -213,7 +230,7 @@ fun LineGraph(dataPoints: List<DataPoint>) {
                 Modifier
                     .align(Alignment.TopStart)
                     .fillMaxHeight()
-                    .width(90.dp)
+                    .width(columnWidth)
                     .padding(start = 16.dp), rowOffset, globalYScale,
                 values = {
                     (0..4).map {
@@ -232,7 +249,7 @@ fun LineGraph(dataPoints: List<DataPoint>) {
                 Modifier
                     .align(Alignment.BottomStart)
                     .fillMaxWidth()
-                    .height(50.dp)
+                    .height(rowHeight)
                     .clip(RowClip(columnOffset + paddingLeft - pointRadius)),
                 columnOffset + paddingLeft,
                 offset.value,
@@ -242,7 +259,7 @@ fun LineGraph(dataPoints: List<DataPoint>) {
             ) {
                 values().forEach { (text, i) ->
                     val color = MaterialTheme.colors.onSurface
-                    Column() {
+                    Column {
                         val isMajor = i.toInt() % 4 == 0
                         val radius = if (isMajor) 20f else 10f
                         Canvas(
