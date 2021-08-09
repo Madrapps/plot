@@ -1,7 +1,6 @@
 package com.madrapps.plot
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Canvas
@@ -22,18 +21,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -231,13 +226,19 @@ fun LineGraph(dataPoints: List<DataPoint>) {
                     }
                 }
             )
-            Text(
-                text = "000000000000",
+            GraphRow(
                 Modifier
                     .align(Alignment.BottomStart)
                     .fillMaxWidth()
                     .height(30.dp)
-                    .clip(RowClip(columnOffset + paddingLeft - pointRadius)), color = Color.Red
+                    .clip(RowClip(columnOffset + paddingLeft - pointRadius)), columnOffset + paddingLeft, 1f*xZoom.value,
+                values = {
+                    (0..10).map {
+                        val v = it.toFloat()
+                        Value(v.toInt().toString(), v)
+                    }
+                },
+                stepSize = 20.dp
             )
         }
     }
@@ -250,6 +251,7 @@ fun GraphRow(
     scale: Float,
     color: Color = MaterialTheme.colors.onSurface,
     values: () -> List<Value> = { listOf(Value("0", 0f)) },
+    stepSize: Dp,
     content: @Composable () -> Unit = {
         values().forEach { (text, _) ->
             Text(
@@ -266,22 +268,19 @@ fun GraphRow(
     val steps = valueList.size - 1
     val min = valueList.first().value
     val max = valueList.last().value
-    val stepSize = if (steps != 0) {
-        (max - min) / steps
-    } else 0f
 
     Layout(content, modifier) { measurables, constraints ->
         val placeables = measurables.map { measurable ->
             measurable.measure(constraints.copy(minWidth = 0, minHeight = 0))
         }
         layout(constraints.maxWidth, constraints.maxHeight) {
-            val availableHeight = (constraints.maxHeight - xStart.toPx())
-            var yPos = availableHeight.toInt()
-
+            val availableWidth = (constraints.maxWidth - xStart.toPx())
+            var xPos = xStart.toPx().toInt()
+            var step = stepSize.toPx()
             placeables.forEach { placeable ->
-                yPos -= (placeable.height / 2f).toInt() + 1
-                placeable.place(x = 0, y = yPos)
-                yPos -= (stepSize * availableHeight / max * scale).toInt() - (placeable.height / 2f).toInt()
+                xPos -= (placeable.width / 2f).toInt()
+                placeable.place(x = xPos, y = 0)
+                xPos += ((step * scale) + (placeable.width / 2f)).toInt()
             }
         }
     }
