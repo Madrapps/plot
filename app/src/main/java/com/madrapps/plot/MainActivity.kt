@@ -16,8 +16,9 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -35,6 +36,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -158,7 +160,6 @@ fun LineGraph(plot: LinePlot) {
     val paddingRight = 16.dp
     val globalXScale = 1f
     val globalYScale = 0.9f
-    val columnWidth = 90.dp
     val columnOffset = 30.dp + 16.dp
     val bgColor = MaterialTheme.colors.surface
     val xAxisText: String? = "Time (in hours)"
@@ -169,6 +170,7 @@ fun LineGraph(plot: LinePlot) {
     val isDragging = remember { mutableStateOf(false) }
     val xZoom = remember { mutableStateOf(globalXScale) }
     val rowHeight = remember { mutableStateOf(0f) }
+    val columnWidth = remember { mutableStateOf(0f) }
 
     val isZoomAllowed = true
     val isDragAllowed = true
@@ -213,7 +215,7 @@ fun LineGraph(plot: LinePlot) {
                     }
                 },
                 onDraw = {
-                    val xStart = columnOffset.toPx()
+                    val xStart = columnWidth.value
                     val yStart = rowHeight.value
                     val availableWidth = (size.width - xStart)
                     val availableHeight = size.height - yStart
@@ -322,8 +324,13 @@ fun LineGraph(plot: LinePlot) {
                 Modifier
                     .align(Alignment.TopStart)
                     .fillMaxHeight()
-                    .width(columnWidth)
-                    .padding(start = 16.dp), rowHeight.value, globalYScale,
+                    .wrapContentWidth()
+                    .onGloballyPositioned {
+                        columnWidth.value = it.size.width.toFloat()
+                    }
+                    //.widthIn(max = 50.dp)
+                    .padding(start = 16.dp, end = 8.dp)
+                , rowHeight.value, globalYScale,
                 values = {
                     (0..4).map {
                         val v = it * 25f
@@ -342,17 +349,15 @@ fun LineGraph(plot: LinePlot) {
                     .align(Alignment.BottomStart)
                     .fillMaxWidth()
                     .wrapContentHeight()
-                    .clip(RowClip(columnOffset - pointRadius, paddingRight))
+                    .clip(RowClip(columnWidth.value - pointRadius.value * LocalDensity.current.density, paddingRight))
                     .onGloballyPositioned {
-                        Log.d("RONNY", "Height = ${it.size}")
                         rowHeight.value = it.size.height.toFloat()
                     }
                     .padding(bottom = 8.dp, top = 8.dp)
             ) {
-
                 GraphRow(
                     Modifier,
-                    columnOffset,
+                    columnWidth.value,
                     offset.value,
                     1f * xZoom.value,
                     values = values,

@@ -8,7 +8,7 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 
-class RowClip(private val leftPadding: Dp, private val rightPadding: Dp) : Shape {
+class RowClip(private val leftPadding: Float, private val rightPadding: Dp) : Shape {
     override fun createOutline(
         size: Size,
         layoutDirection: LayoutDirection,
@@ -16,7 +16,7 @@ class RowClip(private val leftPadding: Dp, private val rightPadding: Dp) : Shape
     ): Outline {
         return Outline.Rectangle(
             Rect(
-                leftPadding.value * density.density,
+                leftPadding,
                 0f,
                 size.width - rightPadding.value * density.density,
                 size.height

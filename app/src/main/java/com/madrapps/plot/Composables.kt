@@ -38,9 +38,10 @@ fun GraphColumn(
 
     Layout(content, modifier) { measurables, constraints ->
         val placeables = measurables.map { measurable ->
-            measurable.measure(constraints.copy(minWidth = 0, minHeight = 0))
+            measurable.measure(constraints.copy(minHeight = 0))
         }
-        layout(constraints.maxWidth, constraints.maxHeight) {
+        val width = placeables.maxOf { it.width }
+        layout(width, constraints.maxHeight) {
             val availableHeight = (constraints.maxHeight - yStart)
             var yPos = availableHeight.toInt()
 
@@ -57,7 +58,7 @@ fun GraphColumn(
 @Composable
 fun GraphRow(
     modifier: Modifier,
-    xStart: Dp,
+    xStart: Float,
     scrollOffset: Float,
     scale: Float,
     color: Color = MaterialTheme.colors.onSurface,
@@ -81,7 +82,7 @@ fun GraphRow(
         }
         val height = placeables.maxOf { it.height }
         layout(constraints.maxWidth, height) {
-            var xPos = (xStart.toPx() - scrollOffset).toInt()
+            var xPos = (xStart - scrollOffset).toInt()
             val step = stepSize.toPx()
             placeables.forEach { placeable ->
                 xPos -= (placeable.width / 2f).toInt()
