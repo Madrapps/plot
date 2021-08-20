@@ -19,7 +19,12 @@ data class DataPoint(val x: Float, val y: Float)
 
 data class LinePlot(
     val lines: List<Line>,
-    val grid: Grid? = null
+    val grid: Grid? = null,
+    val dragSelection: Connection? = Connection(
+        Color.Red,
+        strokeWidth = 2.dp,
+        pathEffect = PathEffect.dashPathEffect(floatArrayOf(40f,20f))
+    ),
 ) {
     data class Line(
         val dataPoints: List<DataPoint>,

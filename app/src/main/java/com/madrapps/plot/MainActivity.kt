@@ -296,10 +296,7 @@ fun LineGraph(plot: LinePlot) {
 
                     // Draw Drag line
                     if (isDragging.value) {
-                        drawLine(
-                            Color.Red, Offset(xLock, 0f),
-                            Offset(xLock, availableHeight), lineWidth.toPx()
-                        )
+                        plot.dragSelection?.draw?.invoke(this, Offset(xLock, availableHeight), Offset(xLock, 0f))
                     }
 
                     // Draw column
