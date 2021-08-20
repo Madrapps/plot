@@ -12,7 +12,7 @@ import androidx.compose.ui.unit.Dp
 @Composable
 fun GraphColumn(
     modifier: Modifier,
-    yStart: Dp,
+    yStart: Float,
     scale: Float,
     color: Color = MaterialTheme.colors.onSurface,
     values: () -> List<Value> = { listOf(Value("0", 0f)) },
@@ -41,7 +41,7 @@ fun GraphColumn(
             measurable.measure(constraints.copy(minWidth = 0, minHeight = 0))
         }
         layout(constraints.maxWidth, constraints.maxHeight) {
-            val availableHeight = (constraints.maxHeight - yStart.toPx())
+            val availableHeight = (constraints.maxHeight - yStart)
             var yPos = availableHeight.toInt()
 
             placeables.forEach { placeable ->
@@ -77,9 +77,10 @@ fun GraphRow(
 ) {
     Layout(content, modifier) { measurables, constraints ->
         val placeables = measurables.map { measurable ->
-            measurable.measure(constraints.copy(minWidth = 0, minHeight = 0))
+            measurable.measure(constraints)
         }
-        layout(constraints.maxWidth, constraints.maxHeight) {
+        val height = placeables.maxOf { it.height }
+        layout(constraints.maxWidth, height) {
             var xPos = (xStart.toPx() - scrollOffset).toInt()
             val step = stepSize.toPx()
             placeables.forEach { placeable ->

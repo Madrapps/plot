@@ -1,6 +1,7 @@
 package com.madrapps.plot
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Canvas
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -32,6 +34,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -150,24 +153,22 @@ fun LineGraph(plot: LinePlot) {
 
     // Graph Line properties
     val pointRadius = 6.dp
-    val lineWidth = 3.dp
 
     // Overall Graph properties
-    val paddingLeft = 16.dp
     val paddingRight = 16.dp
     val globalXScale = 1f
     val globalYScale = 0.9f
-    val rowOffset = 60.dp
-    val columnOffset = 30.dp
-    val rowHeight = 50.dp
     val columnWidth = 90.dp
+    val columnOffset = 30.dp + 16.dp
     val bgColor = MaterialTheme.colors.surface
+    val xAxisText: String? = "Time (in hours)"
 
     val offset = remember { mutableStateOf(0f) }
     val maxScrollOffset = remember { mutableStateOf(0f) }
     val dragOffset = remember { mutableStateOf(0f) }
     val isDragging = remember { mutableStateOf(false) }
     val xZoom = remember { mutableStateOf(globalXScale) }
+    val rowHeight = remember { mutableStateOf(0f) }
 
     val isZoomAllowed = true
     val isDragAllowed = true
@@ -212,8 +213,8 @@ fun LineGraph(plot: LinePlot) {
                     }
                 },
                 onDraw = {
-                    val xStart = columnOffset.toPx() + paddingLeft.toPx()
-                    val yStart = rowOffset.toPx()
+                    val xStart = columnOffset.toPx()
+                    val yStart = rowHeight.value
                     val availableWidth = (size.width - xStart)
                     val availableHeight = size.height - yStart
                     val xScale = 1f * xZoom.value
@@ -296,7 +297,11 @@ fun LineGraph(plot: LinePlot) {
 
                     // Draw Drag line
                     if (isDragging.value) {
-                        plot.dragSelection?.draw?.invoke(this, Offset(xLock, availableHeight), Offset(xLock, 0f))
+                        plot.dragSelection?.draw?.invoke(
+                            this,
+                            Offset(xLock, availableHeight),
+                            Offset(xLock, 0f)
+                        )
                     }
 
                     // Draw column
@@ -318,7 +323,7 @@ fun LineGraph(plot: LinePlot) {
                     .align(Alignment.TopStart)
                     .fillMaxHeight()
                     .width(columnWidth)
-                    .padding(start = 16.dp), rowOffset, globalYScale,
+                    .padding(start = 16.dp), rowHeight.value, globalYScale,
                 values = {
                     (0..4).map {
                         val v = it * 25f
@@ -332,40 +337,62 @@ fun LineGraph(plot: LinePlot) {
                     Value(v.toInt().toString(), v)
                 }
             }
-            GraphRow(
+            Column(
                 Modifier
                     .align(Alignment.BottomStart)
                     .fillMaxWidth()
-                    .height(rowHeight)
-                    .clip(RowClip(columnOffset + paddingLeft - pointRadius, paddingRight)),
-                columnOffset + paddingLeft,
-                offset.value,
-                1f * xZoom.value,
-                values = values,
-                stepSize = 20.dp
+                    .wrapContentHeight()
+                    .clip(RowClip(columnOffset - pointRadius, paddingRight))
+                    .onGloballyPositioned {
+                        Log.d("RONNY", "Height = ${it.size}")
+                        rowHeight.value = it.size.height.toFloat()
+                    }
+                    .padding(bottom = 8.dp, top = 8.dp)
             ) {
-                values().forEach { (text, i) ->
-                    val color = MaterialTheme.colors.onSurface
-                    Column {
-                        val isMajor = i.toInt() % 4 == 0
-                        val radius = if (isMajor) 20f else 10f
-                        Canvas(
-                            modifier = Modifier
-                                .align(Alignment.CenterHorizontally)
-                                .height(20.dp),
-                            onDraw = {
-                                drawCircle(color = color, radius, Offset(0f, 40f))
-                            })
-                        if (isMajor) {
-                            Text(
-                                text = text,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                style = MaterialTheme.typography.caption,
-                                color = MaterialTheme.colors.onSurface
-                            )
+
+                GraphRow(
+                    Modifier,
+                    columnOffset,
+                    offset.value,
+                    1f * xZoom.value,
+                    values = values,
+                    stepSize = 20.dp
+                ) {
+                    values().forEach { (text, i) ->
+                        val color = MaterialTheme.colors.onSurface
+                        Column {
+                            val isMajor = i.toInt() % 4 == 0
+                            val radius = if (isMajor) 20f else 10f
+                            Canvas(
+                                modifier = Modifier
+                                    .align(Alignment.CenterHorizontally)
+                                    .height(20.dp),
+                                onDraw = {
+                                    drawCircle(color = color, radius, Offset(0f, 40f))
+                                })
+                            if (isMajor) {
+                                Text(
+                                    text = text,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    style = MaterialTheme.typography.caption,
+                                    color = MaterialTheme.colors.onSurface
+                                )
+                            }
                         }
                     }
+                }
+                if (xAxisText != null) {
+                    Text(
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .padding(top = 8.dp),
+                        text = xAxisText,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        style = MaterialTheme.typography.subtitle1,
+                        color = MaterialTheme.colors.onSurface
+                    )
                 }
             }
         }
