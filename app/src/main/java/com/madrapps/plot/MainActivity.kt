@@ -129,7 +129,12 @@ class MainActivity : ComponentActivity() {
                                     val px = config.radius.toPx()
                                     val topLeft = Offset(center.x - px, center.y - px)
                                     drawRect(config.color, topLeft, Size(px*2, px*2))
-                                })
+                                }),
+                                Intersection(Color.Red, 4.dp, draw = { config, center ->
+                                    val px = config.radius.toPx()
+                                    val topLeft = Offset(center.x - px, center.y - px)
+                                    drawRect(config.color, topLeft, Size(px*2, px*2))
+                                }),
                             ),
                         )
                     )
@@ -237,24 +242,14 @@ fun LineGraph(lines: List<Line>) {
                         var prevOffset: Offset? = null
                         val intersection = line.intersection
                         val co = line.connection
-                        val hl = line.highlight
+                        val highlight = line.highlight
                         line.dataPoints.forEach { (x, y) ->
                             val x1 = (x * xOffset * xScale) + xStart - offset.value
                             val y1 = availableHeight - (y * yOffset * globalYScale)
                             val curOffset = Offset(x1, y1)
                             if (isDragging.value && (dragOffset.value) > x1 - (xOffset * xScale) / 2 && (dragOffset.value) < x1 + (xOffset * xScale) / 2) {
                                 xLock = x1
-                                if (hl != null) {
-                                    drawCircle(
-                                        hl.color,
-                                        hl.radius.toPx(),
-                                        curOffset,
-                                        hl.alpha,
-                                        hl.style,
-                                        hl.colorFilter,
-                                        hl.blendMode
-                                    )
-                                }
+                                highlight?.draw?.invoke(this, highlight, curOffset)
                             } else {
                                 intersection?.draw?.invoke(this, intersection, curOffset)
                             }
