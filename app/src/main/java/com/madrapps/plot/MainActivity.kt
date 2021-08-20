@@ -128,12 +128,12 @@ class MainActivity : ComponentActivity() {
                                 Intersection(Color.Gray, 4.dp, draw = { config, center ->
                                     val px = config.radius.toPx()
                                     val topLeft = Offset(center.x - px, center.y - px)
-                                    drawRect(config.color, topLeft, Size(px*2, px*2))
+                                    drawRect(config.color, topLeft, Size(px * 2, px * 2))
                                 }),
                                 Intersection(Color.Red, 4.dp, draw = { config, center ->
                                     val px = config.radius.toPx()
                                     val topLeft = Offset(center.x - px, center.y - px)
-                                    drawRect(config.color, topLeft, Size(px*2, px*2))
+                                    drawRect(config.color, topLeft, Size(px * 2, px * 2))
                                 }),
                             ),
                         )
@@ -239,24 +239,37 @@ fun LineGraph(lines: List<Line>) {
 
                     // Draw Lines and Points
                     lines.forEach { line ->
-                        var prevOffset: Offset? = null
                         val intersection = line.intersection
                         val connection = line.connection
                         val highlight = line.highlight
-                        line.dataPoints.forEach { (x, y) ->
-                            val x1 = (x * xOffset * xScale) + xStart - offset.value
-                            val y1 = availableHeight - (y * yOffset * globalYScale)
-                            val curOffset = Offset(x1, y1)
-                            if (prevOffset != null) {
-                                connection?.draw?.invoke(this, connection, prevOffset!!, curOffset)
+
+                        var curOffset: Offset? = null
+                        var nextOffset: Offset? = null
+                        line.dataPoints.forEachIndexed { i, _ ->
+                            if (i == 0) {
+                                val (x, y) = line.dataPoints[i]
+                                val x1 = (x * xOffset * xScale) + xStart - offset.value
+                                val y1 = availableHeight - (y * yOffset * globalYScale)
+                                curOffset = Offset(x1, y1)
                             }
-                            prevOffset = curOffset
-                            if (isDragging.value && (dragOffset.value) > x1 - (xOffset * xScale) / 2 && (dragOffset.value) < x1 + (xOffset * xScale) / 2) {
-                                xLock = x1
-                                highlight?.draw?.invoke(this, highlight, curOffset)
-                            } else {
-                                intersection?.draw?.invoke(this, intersection, curOffset)
+                            if (line.dataPoints.indices.contains(i+1)) {
+                                val (x, y) = line.dataPoints[i+1]
+                                val x2 = (x * xOffset * xScale) + xStart - offset.value
+                                val y2 = availableHeight - (y * yOffset * globalYScale)
+                                nextOffset = Offset(x2, y2)
                             }
+                            if (nextOffset != null && curOffset != null) {
+                                connection?.draw?.invoke(this, connection, curOffset!!, nextOffset!!)
+                            }
+                            curOffset?.let {
+                                if (isDragging.value && (dragOffset.value) > it.x - (xOffset * xScale) / 2 && (dragOffset.value) < it.x + (xOffset * xScale) / 2) {
+                                    xLock = it.x
+                                    highlight?.draw?.invoke(this, highlight, it)
+                                } else {
+                                    intersection?.draw?.invoke(this, intersection, it)
+                                }
+                            }
+                            curOffset = nextOffset
                         }
                     }
 
