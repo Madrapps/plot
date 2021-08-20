@@ -125,8 +125,7 @@ class MainActivity : ComponentActivity() {
                             Line(
                                 dataPoints2,
                                 Connection(Color.Gray, 2.dp),
-                                Intersection(Color.Gray, 3.dp),
-                                Intersection(Color.DarkGray, 3.dp)
+                                null
                             ),
                         )
                     )
@@ -241,27 +240,31 @@ fun LineGraph(lines: List<Line>) {
                             val curOffset = Offset(x1, y1)
                             if (isDragging.value && (dragOffset.value) > x1 - (xOffset * xScale) / 2 && (dragOffset.value) < x1 + (xOffset * xScale) / 2) {
                                 xLock = x1
-                                drawCircle(
-                                    hl.color,
-                                    hl.radius.toPx(),
-                                    curOffset,
-                                    hl.alpha,
-                                    hl.style,
-                                    hl.colorFilter,
-                                    hl.blendMode
-                                )
+                                if (hl != null) {
+                                    drawCircle(
+                                        hl.color,
+                                        hl.radius.toPx(),
+                                        curOffset,
+                                        hl.alpha,
+                                        hl.style,
+                                        hl.colorFilter,
+                                        hl.blendMode
+                                    )
+                                }
                             } else {
-                                drawCircle(
-                                    pt.color,
-                                    pt.radius.toPx(),
-                                    curOffset,
-                                    pt.alpha,
-                                    pt.style,
-                                    pt.colorFilter,
-                                    pt.blendMode
-                                )
+                                if (pt != null) {
+                                    drawCircle(
+                                        pt.color,
+                                        pt.radius.toPx(),
+                                        curOffset,
+                                        pt.alpha,
+                                        pt.style,
+                                        pt.colorFilter,
+                                        pt.blendMode
+                                    )
+                                }
                             }
-                            if (prevOffset != null) {
+                            if (prevOffset != null && co != null) {
                                 drawLine(
                                     co.color,
                                     prevOffset!!,
@@ -404,9 +407,9 @@ data class DataPoint(val x: Float, val y: Float)
 
 data class Line(
     val dataPoints: List<DataPoint>,
-    val connection: Connection,
-    val intersection: Intersection,
-    val highlight: Intersection,
+    val connection: Connection?,
+    val intersection: Intersection?,
+    val highlight: Intersection? = null,
 )
 
 data class Connection(
