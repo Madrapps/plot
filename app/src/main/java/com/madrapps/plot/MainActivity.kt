@@ -237,36 +237,26 @@ fun LineGraph(lines: List<Line>) {
                         )
                     }
 
-                    // Draw Points and Lines
+                    // Draw Lines and Points
                     lines.forEach { line ->
                         var prevOffset: Offset? = null
                         val intersection = line.intersection
-                        val co = line.connection
+                        val connection = line.connection
                         val highlight = line.highlight
                         line.dataPoints.forEach { (x, y) ->
                             val x1 = (x * xOffset * xScale) + xStart - offset.value
                             val y1 = availableHeight - (y * yOffset * globalYScale)
                             val curOffset = Offset(x1, y1)
+                            if (prevOffset != null) {
+                                connection?.draw?.invoke(this, connection, prevOffset!!, curOffset)
+                            }
+                            prevOffset = curOffset
                             if (isDragging.value && (dragOffset.value) > x1 - (xOffset * xScale) / 2 && (dragOffset.value) < x1 + (xOffset * xScale) / 2) {
                                 xLock = x1
                                 highlight?.draw?.invoke(this, highlight, curOffset)
                             } else {
                                 intersection?.draw?.invoke(this, intersection, curOffset)
                             }
-                            if (prevOffset != null && co != null) {
-                                drawLine(
-                                    co.color,
-                                    prevOffset!!,
-                                    curOffset,
-                                    co.strokeWidth.toPx(),
-                                    co.cap,
-                                    co.pathEffect,
-                                    co.alpha,
-                                    co.colorFilter,
-                                    co.blendMode
-                                )
-                            }
-                            prevOffset = curOffset
                         }
                     }
 
@@ -410,6 +400,19 @@ data class Connection(
     val alpha: Float = 1.0f,
     val colorFilter: ColorFilter? = null,
     val blendMode: BlendMode = DrawScope.DefaultBlendMode,
+    val draw: DrawScope.(Connection, Offset, Offset) -> Unit = { config, start, end ->
+        drawLine(
+            config.color,
+            start,
+            end,
+            config.strokeWidth.toPx(),
+            config.cap,
+            config.pathEffect,
+            config.alpha,
+            config.colorFilter,
+            config.blendMode
+        )
+    }
 )
 
 data class Intersection(
