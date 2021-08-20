@@ -169,7 +169,7 @@ fun LineGraph(plot: LinePlot) {
     val isDragging = remember { mutableStateOf(false) }
     val xZoom = remember { mutableStateOf(globalXScale) }
 
-    val isZoomAllowed = false
+    val isZoomAllowed = true
     val isDragAllowed = true
 
     CompositionLocalProvider(
@@ -222,9 +222,9 @@ fun LineGraph(plot: LinePlot) {
                     val yOffset = availableHeight / allDataPoints.maxOf { it.y }
 
                     val xLastPoint = allDataPoints.maxOf { it.x } * xOffset * xScale + xStart
-                    if (xLastPoint > availableWidth) {
-                        maxScrollOffset.value = xLastPoint - availableWidth
-                    }
+                    maxScrollOffset.value = if (xLastPoint > availableWidth) {
+                        xLastPoint - size.width + paddingRight.toPx() + pointRadius.toPx()
+                    } else 0f
                     var xLock = 0f
 
                     // Draw Grid lines
@@ -340,7 +340,7 @@ fun LineGraph(plot: LinePlot) {
                     .align(Alignment.BottomStart)
                     .fillMaxWidth()
                     .height(rowHeight)
-                    .clip(RowClip(columnOffset + paddingLeft - pointRadius)),
+                    .clip(RowClip(columnOffset + paddingLeft - pointRadius, paddingRight)),
                 columnOffset + paddingLeft,
                 offset.value,
                 1f * xZoom.value,

@@ -30,7 +30,6 @@ suspend fun PointerInputScope.detectDragZoomGesture(
                 do {
                     val event = awaitPointerEvent()
                     val canceled = event.changes.any { it.positionChangeConsumed() }
-                    Log.d("RONNY", "nextEV = $event")
                     if (event.changes.size == 1) {
                         break
                     } else if (event.changes.size == 2) {
