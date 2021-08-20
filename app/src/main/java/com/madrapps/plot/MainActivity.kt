@@ -9,7 +9,13 @@ import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.rememberScrollableState
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -22,17 +28,26 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.DrawStyle
+import androidx.compose.ui.graphics.drawscope.Fill
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.madrapps.plot.ui.theme.PlotTheme
 
-private val dataPoints = listOf(
+private val dataPoints1 = listOf(
     DataPoint(0f, 0f),
     DataPoint(1f, 0f),
     DataPoint(2f, 0f),
@@ -49,7 +64,7 @@ private val dataPoints = listOf(
     DataPoint(13f, 80f),
     DataPoint(14f, 70f),
     DataPoint(15f, 25f),
-    DataPoint(16f, 0f),
+    DataPoint(16f, 0f), // FIXME :Bug: Change this to 200f. Column doesn't adapt.
     DataPoint(17f, 0f),
     DataPoint(18f, 35f),
     DataPoint(19f, 60f),
@@ -57,6 +72,35 @@ private val dataPoints = listOf(
     DataPoint(21f, 40f),
     DataPoint(22f, 75f),
     DataPoint(23f, 50f),
+//    DataPoint(27f, 20f), // FIXME :Bug: Add these. Row doesn't react to extra values
+//    DataPoint(33f, 80f),
+)
+
+private val dataPoints2 = listOf(
+    DataPoint(0f, 0f),
+    DataPoint(1f, 0f),
+    DataPoint(2f, 25f),
+    DataPoint(3f, 75f),
+    DataPoint(4f, 100f),
+    DataPoint(5f, 80f),
+    DataPoint(6f, 75f),
+    DataPoint(7f, 50f),
+    DataPoint(8f, 80f),
+    DataPoint(9f, 70f),
+    DataPoint(10f, 0f),
+    DataPoint(11f, 0f),
+    DataPoint(12f, 45f),
+    DataPoint(13f, 20f),
+    DataPoint(14f, 40f),
+    DataPoint(15f, 75f),
+    DataPoint(16f, 50f),
+    DataPoint(17f, 75f),
+    DataPoint(18f, 40f),
+    DataPoint(19f, 20f),
+    DataPoint(20f, 0f),
+    DataPoint(21f, 0f),
+    DataPoint(22f, 50f),
+    DataPoint(23f, 25f),
 )
 
 class MainActivity : ComponentActivity() {
@@ -70,7 +114,22 @@ class MainActivity : ComponentActivity() {
                         .height(300.dp),
                     color = MaterialTheme.colors.background
                 ) {
-                    LineGraph(dataPoints)
+                    LineGraph(
+                        listOf(
+                            Line(
+                                dataPoints1,
+                                Connection(Color.Blue, 3.dp),
+                                Intersection(Color.Blue, 6.dp),
+                                Intersection(Color.Red, 4.dp)
+                            ),
+                            Line(
+                                dataPoints2,
+                                Connection(Color.Gray, 2.dp),
+                                Intersection(Color.Gray, 3.dp),
+                                Intersection(Color.DarkGray, 3.dp)
+                            ),
+                        )
+                    )
                 }
             }
         }
@@ -78,7 +137,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun LineGraph(dataPoints: List<DataPoint>) {
+fun LineGraph(lines: List<Line>) {
     // Graph Line properties
     val pointRadius = 6.dp
     val lineWidth = 3.dp
@@ -149,10 +208,10 @@ fun LineGraph(dataPoints: List<DataPoint>) {
                     val availableHeight = size.height - yStart
                     val xScale = 1f * xZoom.value
                     val xOffset = 20.dp.toPx()
-                    val yOffset = availableHeight / dataPoints.maxOf { it.y }
+                    val allDataPoints = lines.flatMap { it.dataPoints }
+                    val yOffset = availableHeight / allDataPoints.maxOf { it.y }
 
-                    var prevOffset: Offset? = null
-                    val xLastPoint = dataPoints.last().x * xOffset * xScale + xStart
+                    val xLastPoint = allDataPoints.maxOf { it.x } * xOffset * xScale + xStart
                     if (xLastPoint > availableWidth) {
                         maxScrollOffset.value = xLastPoint - availableWidth
                     }
@@ -171,21 +230,54 @@ fun LineGraph(dataPoints: List<DataPoint>) {
                     }
 
                     // Draw Points and Lines
-                    dataPoints.forEach { (x, y) ->
-                        val x1 = (x * xOffset * xScale) + xStart - offset.value
-                        val y1 = availableHeight - (y * yOffset * globalYScale)
-                        val curOffset = Offset(x1, y1)
-                        val color =
+                    lines.forEach { line ->
+                        var prevOffset: Offset? = null
+                        val pt = line.intersection
+                        val co = line.connection
+                        val hl = line.highlight
+                        line.dataPoints.forEach { (x, y) ->
+                            val x1 = (x * xOffset * xScale) + xStart - offset.value
+                            val y1 = availableHeight - (y * yOffset * globalYScale)
+                            val curOffset = Offset(x1, y1)
                             if (isDragging.value && (dragOffset.value) > x1 - (xOffset * xScale) / 2 && (dragOffset.value) < x1 + (xOffset * xScale) / 2) {
                                 xLock = x1
-                                Color.Red
-                            } else Color.Blue
-                        drawCircle(color, pointRadius.toPx(), curOffset)
-                        if (prevOffset != null) {
-                            drawLine(Color.Blue, prevOffset!!, curOffset, lineWidth.toPx())
+                                drawCircle(
+                                    hl.color,
+                                    hl.radius.toPx(),
+                                    curOffset,
+                                    hl.alpha,
+                                    hl.style,
+                                    hl.colorFilter,
+                                    hl.blendMode
+                                )
+                            } else {
+                                drawCircle(
+                                    pt.color,
+                                    pt.radius.toPx(),
+                                    curOffset,
+                                    pt.alpha,
+                                    pt.style,
+                                    pt.colorFilter,
+                                    pt.blendMode
+                                )
+                            }
+                            if (prevOffset != null) {
+                                drawLine(
+                                    co.color,
+                                    prevOffset!!,
+                                    curOffset,
+                                    co.strokeWidth.toPx(),
+                                    co.cap,
+                                    co.pathEffect,
+                                    co.alpha,
+                                    co.colorFilter,
+                                    co.blendMode
+                                )
+                            }
+                            prevOffset = curOffset
                         }
-                        prevOffset = curOffset
                     }
+
                     if (isDragging.value) {
                         drawLine(
                             Color.Red, Offset(xLock, 0f),
@@ -208,7 +300,7 @@ fun LineGraph(dataPoints: List<DataPoint>) {
                     )
 
                     // Draw area under curve
-                    val points = dataPoints.map { (x, y) ->
+                    val points = dataPoints1.map { (x, y) ->
                         val x1 = (x * xOffset * xScale) + xStart - offset.value
                         val y1 = availableHeight - (y * yOffset * globalYScale)
                         Offset(x1, y1)
@@ -289,8 +381,51 @@ fun LineGraph(dataPoints: List<DataPoint>) {
 @Composable
 fun DefaultPreview() {
     PlotTheme {
-        LineGraph(dataPoints)
+        LineGraph(
+            listOf(
+                Line(
+                    dataPoints1,
+                    Connection(Color.Blue, 3.dp),
+                    Intersection(Color.Blue, 6.dp),
+                    Intersection(Color.Red, 4.dp)
+                ),
+                Line(
+                    dataPoints2,
+                    Connection(Color.Gray, 2.dp),
+                    Intersection(Color.Gray, 3.dp),
+                    Intersection(Color.Gray, 3.dp)
+                ),
+            )
+        )
     }
 }
 
 data class DataPoint(val x: Float, val y: Float)
+
+data class Line(
+    val dataPoints: List<DataPoint>,
+    val connection: Connection,
+    val intersection: Intersection,
+    val highlight: Intersection,
+)
+
+data class Connection(
+    val color: Color,
+    val strokeWidth: Dp,
+    val cap: StrokeCap = Stroke.DefaultCap,
+    val pathEffect: PathEffect? = null,
+    /*FloatRange(from = 0.0, to = 1.0)*/
+    val alpha: Float = 1.0f,
+    val colorFilter: ColorFilter? = null,
+    val blendMode: BlendMode = DrawScope.DefaultBlendMode,
+)
+
+data class Intersection(
+    val color: Color,
+    val radius: Dp,
+    /*@FloatRange(from = 0.0, to = 1.0)*/
+    val alpha: Float = 1.0f,
+    val style: DrawStyle = Fill,
+    val colorFilter: ColorFilter? = null,
+    val blendMode: BlendMode = DrawScope.DefaultBlendMode,
+)
