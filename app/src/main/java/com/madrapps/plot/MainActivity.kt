@@ -125,7 +125,11 @@ class MainActivity : ComponentActivity() {
                             Line(
                                 dataPoints2,
                                 Connection(Color.Gray, 2.dp),
-                                null
+                                Intersection(Color.Gray, 4.dp, draw = { config, center ->
+                                    val px = config.radius.toPx()
+                                    val topLeft = Offset(center.x - px, center.y - px)
+                                    drawRect(config.color, topLeft, Size(px*2, px*2))
+                                })
                             ),
                         )
                     )
@@ -231,7 +235,7 @@ fun LineGraph(lines: List<Line>) {
                     // Draw Points and Lines
                     lines.forEach { line ->
                         var prevOffset: Offset? = null
-                        val pt = line.intersection
+                        val intersection = line.intersection
                         val co = line.connection
                         val hl = line.highlight
                         line.dataPoints.forEach { (x, y) ->
@@ -252,17 +256,7 @@ fun LineGraph(lines: List<Line>) {
                                     )
                                 }
                             } else {
-                                if (pt != null) {
-                                    drawCircle(
-                                        pt.color,
-                                        pt.radius.toPx(),
-                                        curOffset,
-                                        pt.alpha,
-                                        pt.style,
-                                        pt.colorFilter,
-                                        pt.blendMode
-                                    )
-                                }
+                                intersection?.draw?.invoke(this, intersection, curOffset)
                             }
                             if (prevOffset != null && co != null) {
                                 drawLine(
@@ -431,4 +425,15 @@ data class Intersection(
     val style: DrawStyle = Fill,
     val colorFilter: ColorFilter? = null,
     val blendMode: BlendMode = DrawScope.DefaultBlendMode,
+    val draw: DrawScope.(Intersection, Offset) -> Unit = { config, center ->
+        drawCircle(
+            config.color,
+            config.radius.toPx(),
+            center,
+            config.alpha,
+            config.style,
+            config.colorFilter,
+            config.blendMode
+        )
+    }
 )
