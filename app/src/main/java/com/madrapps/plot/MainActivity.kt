@@ -111,7 +111,8 @@ class MainActivity : ComponentActivity() {
                                 dataPoints1,
                                 Connection(Color.Blue, 3.dp),
                                 Intersection(Color.Blue, 6.dp),
-                                Intersection(Color.Red, 4.dp)
+                                Intersection(Color.Red, 4.dp),
+                                AreaUnderLine(Color.Blue, 0.1f)
                             ),
                             Line(
                                 dataPoints2,
@@ -232,25 +233,28 @@ fun LineGraph(lines: List<Line>) {
                         val intersection = line.intersection
                         val connection = line.connection
                         val highlight = line.highlight
+                        val areaUnderLine = line.areaUnderLine
 
                         // Draw area under curve
-                        val points = line.dataPoints.map { (x, y) ->
-                            val x1 = (x * xOffset * xScale) + xStart - offset.value
-                            val y1 = availableHeight - (y * yOffset * globalYScale)
-                            Offset(x1, y1)
-                        }
-                        val p = Path()
-                        points.forEachIndexed { index, offset ->
-                            if (index == 0) {
-                                p.moveTo(offset.x, offset.y)
-                            } else {
-                                p.lineTo(offset.x, offset.y)
+                        if (areaUnderLine != null) {
+                            val points = line.dataPoints.map { (x, y) ->
+                                val x1 = (x * xOffset * xScale) + xStart - offset.value
+                                val y1 = availableHeight - (y * yOffset * globalYScale)
+                                Offset(x1, y1)
                             }
+                            val p = Path()
+                            points.forEachIndexed { index, offset ->
+                                if (index == 0) {
+                                    p.moveTo(offset.x, offset.y)
+                                } else {
+                                    p.lineTo(offset.x, offset.y)
+                                }
+                            }
+                            val last = points.last()
+                            val first = points.first()
+                            p.lineTo(last.x, first.y)
+                            drawPath(p, areaUnderLine.color, areaUnderLine.alpha)
                         }
-                        val last = points.last()
-                        val first = points.first()
-                        p.lineTo(last.x, first.y)
-                        drawPath(p, Color.Blue, 0.1f)
 
                         // Draw Lines and Points
                         var curOffset: Offset? = null
@@ -378,7 +382,8 @@ fun DefaultPreview() {
                     dataPoints1,
                     Connection(Color.Blue, 3.dp),
                     Intersection(Color.Blue, 6.dp),
-                    Intersection(Color.Red, 4.dp)
+                    Intersection(Color.Red, 4.dp),
+                    AreaUnderLine(Color.Blue, 0.1f)
                 ),
                 Line(
                     dataPoints2,

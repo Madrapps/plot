@@ -20,6 +20,7 @@ data class Line(
     val connection: Connection?,
     val intersection: Intersection?,
     val highlight: Intersection? = null,
+    val areaUnderLine: AreaUnderLine? = null
 )
 
 data class Connection(
@@ -65,4 +66,13 @@ data class Intersection(
             blendMode
         )
     }
+)
+
+data class AreaUnderLine(
+    val color: Color = Color.LightGray,
+    /*@FloatRange(from = 0.0, to = 1.0)*/
+    val alpha: Float = 1.0f,
+    val style: DrawStyle = Fill,
+    val colorFilter: ColorFilter? = null,
+    val blendMode: BlendMode = DrawScope.DefaultBlendMode
 )
