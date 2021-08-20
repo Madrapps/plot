@@ -253,7 +253,7 @@ fun LineGraph(lines: List<Line>) {
                             val last = points.last()
                             val first = points.first()
                             p.lineTo(last.x, first.y)
-                            drawPath(p, areaUnderLine.color, areaUnderLine.alpha)
+                            areaUnderLine.draw(this, p)
                         }
 
                         // Draw Lines and Points

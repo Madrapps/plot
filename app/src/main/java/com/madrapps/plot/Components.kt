@@ -4,6 +4,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
@@ -74,5 +75,8 @@ data class AreaUnderLine(
     val alpha: Float = 1.0f,
     val style: DrawStyle = Fill,
     val colorFilter: ColorFilter? = null,
-    val blendMode: BlendMode = DrawScope.DefaultBlendMode
+    val blendMode: BlendMode = DrawScope.DefaultBlendMode,
+    val draw: DrawScope.(Path) -> Unit = { path ->
+        drawPath(path, color, alpha, style, colorFilter, blendMode)
+    }
 )
