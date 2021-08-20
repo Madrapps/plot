@@ -27,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
@@ -38,6 +39,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.madrapps.plot.LinePlot.AreaUnderLine
 import com.madrapps.plot.LinePlot.Connection
+import com.madrapps.plot.LinePlot.Grid
 import com.madrapps.plot.LinePlot.Intersection
 import com.madrapps.plot.LinePlot.Line
 import com.madrapps.plot.ui.theme.PlotTheme
@@ -133,7 +135,7 @@ class MainActivity : ComponentActivity() {
                                         drawRect(Color.Red, topLeft, Size(px * 2, px * 2))
                                     },
                                 ),
-                            )
+                            ), Grid(Color.Gray)
                         )
                     )
                 }
@@ -225,17 +227,9 @@ fun LineGraph(plot: LinePlot) {
                     }
                     var xLock = 0f
 
-                    // Draw Grid (horizontal lines for every 25 points in Y
-                    (0..4).forEach {
-                        val y = it * 25f
-                        val y1 = availableHeight - (y * yOffset * globalYScale)
-                        drawLine(
-                            Color.Black,
-                            Offset(xStart, y1),
-                            Offset(size.width, y1),
-                            1.dp.toPx()
-                        )
-                    }
+                    // Draw Grid lines
+                    val region = Rect(xStart, yStart, size.width, availableHeight)
+                    plot.grid?.draw?.invoke(this, region, xOffset * xScale, yOffset * globalYScale)
 
                     // Draw Lines and Points and AreaUnderLine
                     lines.forEach { line ->

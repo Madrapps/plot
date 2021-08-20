@@ -1,6 +1,7 @@
 package com.madrapps.plot
 
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
@@ -18,6 +19,7 @@ data class DataPoint(val x: Float, val y: Float)
 
 data class LinePlot(
     val lines: List<Line>,
+    val grid: Grid? = null
 ) {
     data class Line(
         val dataPoints: List<DataPoint>,
@@ -81,6 +83,25 @@ data class LinePlot(
         val blendMode: BlendMode = DrawScope.DefaultBlendMode,
         val draw: DrawScope.(Path) -> Unit = { path ->
             drawPath(path, color, alpha, style, colorFilter, blendMode)
+        }
+    )
+
+    data class Grid(
+        val color: Color,
+        val steps: Int = 5,
+        val lineWidth: Dp = 1.dp,
+        val draw: DrawScope.(Rect, Float, Float) -> Unit = { region, xOffset, yOffset ->
+            val (left, top, right, bottom) = region
+            (0 until steps).forEach {
+                val y = it * 25f
+                val y1 = bottom - (y * yOffset)
+                drawLine(
+                    color,
+                    Offset(left, y1),
+                    Offset(right, y1),
+                    lineWidth.toPx()
+                )
+            }
         }
     )
 }
