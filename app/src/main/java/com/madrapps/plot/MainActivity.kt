@@ -28,21 +28,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.PathEffect
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.drawscope.DrawStyle
-import androidx.compose.ui.graphics.drawscope.Fill
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.madrapps.plot.ui.theme.PlotTheme
@@ -125,16 +116,16 @@ class MainActivity : ComponentActivity() {
                             Line(
                                 dataPoints2,
                                 Connection(Color.Gray, 2.dp),
-                                Intersection(Color.Gray, 4.dp, draw = { config, center ->
-                                    val px = config.radius.toPx()
+                                Intersection { center ->
+                                    val px = 4.dp.toPx()
                                     val topLeft = Offset(center.x - px, center.y - px)
-                                    drawRect(config.color, topLeft, Size(px * 2, px * 2))
-                                }),
-                                Intersection(Color.Red, 4.dp, draw = { config, center ->
-                                    val px = config.radius.toPx()
+                                    drawRect(Color.Gray, topLeft, Size(px * 2, px * 2))
+                                },
+                                Intersection { center ->
+                                    val px = 4.dp.toPx()
                                     val topLeft = Offset(center.x - px, center.y - px)
-                                    drawRect(config.color, topLeft, Size(px * 2, px * 2))
-                                }),
+                                    drawRect(Color.Red, topLeft, Size(px * 2, px * 2))
+                                },
                             ),
                         )
                     )
@@ -252,21 +243,25 @@ fun LineGraph(lines: List<Line>) {
                                 val y1 = availableHeight - (y * yOffset * globalYScale)
                                 curOffset = Offset(x1, y1)
                             }
-                            if (line.dataPoints.indices.contains(i+1)) {
-                                val (x, y) = line.dataPoints[i+1]
+                            if (line.dataPoints.indices.contains(i + 1)) {
+                                val (x, y) = line.dataPoints[i + 1]
                                 val x2 = (x * xOffset * xScale) + xStart - offset.value
                                 val y2 = availableHeight - (y * yOffset * globalYScale)
                                 nextOffset = Offset(x2, y2)
                             }
                             if (nextOffset != null && curOffset != null) {
-                                connection?.draw?.invoke(this, connection, curOffset!!, nextOffset!!)
+                                connection?.draw?.invoke(
+                                    this,
+                                    curOffset!!,
+                                    nextOffset!!
+                                )
                             }
                             curOffset?.let {
                                 if (isDragging.value && (dragOffset.value) > it.x - (xOffset * xScale) / 2 && (dragOffset.value) < it.x + (xOffset * xScale) / 2) {
                                     xLock = it.x
-                                    highlight?.draw?.invoke(this, highlight, it)
+                                    highlight?.draw?.invoke(this, it)
                                 } else {
-                                    intersection?.draw?.invoke(this, intersection, it)
+                                    intersection?.draw?.invoke(this, it)
                                 }
                             }
                             curOffset = nextOffset
@@ -394,57 +389,3 @@ fun DefaultPreview() {
         )
     }
 }
-
-data class DataPoint(val x: Float, val y: Float)
-
-data class Line(
-    val dataPoints: List<DataPoint>,
-    val connection: Connection?,
-    val intersection: Intersection?,
-    val highlight: Intersection? = null,
-)
-
-data class Connection(
-    val color: Color,
-    val strokeWidth: Dp,
-    val cap: StrokeCap = Stroke.DefaultCap,
-    val pathEffect: PathEffect? = null,
-    /*FloatRange(from = 0.0, to = 1.0)*/
-    val alpha: Float = 1.0f,
-    val colorFilter: ColorFilter? = null,
-    val blendMode: BlendMode = DrawScope.DefaultBlendMode,
-    val draw: DrawScope.(Connection, Offset, Offset) -> Unit = { config, start, end ->
-        drawLine(
-            config.color,
-            start,
-            end,
-            config.strokeWidth.toPx(),
-            config.cap,
-            config.pathEffect,
-            config.alpha,
-            config.colorFilter,
-            config.blendMode
-        )
-    }
-)
-
-data class Intersection(
-    val color: Color,
-    val radius: Dp,
-    /*@FloatRange(from = 0.0, to = 1.0)*/
-    val alpha: Float = 1.0f,
-    val style: DrawStyle = Fill,
-    val colorFilter: ColorFilter? = null,
-    val blendMode: BlendMode = DrawScope.DefaultBlendMode,
-    val draw: DrawScope.(Intersection, Offset) -> Unit = { config, center ->
-        drawCircle(
-            config.color,
-            config.radius.toPx(),
-            center,
-            config.alpha,
-            config.style,
-            config.colorFilter,
-            config.blendMode
-        )
-    }
-)
