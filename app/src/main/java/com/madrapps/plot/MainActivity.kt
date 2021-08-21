@@ -1,7 +1,6 @@
 package com.madrapps.plot
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Canvas
@@ -16,7 +15,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.MaterialTheme
@@ -160,9 +158,11 @@ fun LineGraph(plot: LinePlot) {
     val paddingRight = 16.dp
     val globalXScale = 1f
     val globalYScale = 0.9f
-    val columnOffset = 30.dp + 16.dp
-    val bgColor = MaterialTheme.colors.surface
     val xAxisText: String? = "Time (in hours)"
+
+    val isZoomAllowed = true
+    val isDragAllowed = true
+    val detectDragTimeOut = 100L
 
     val offset = remember { mutableStateOf(0f) }
     val maxScrollOffset = remember { mutableStateOf(0f) }
@@ -171,9 +171,7 @@ fun LineGraph(plot: LinePlot) {
     val xZoom = remember { mutableStateOf(globalXScale) }
     val rowHeight = remember { mutableStateOf(0f) }
     val columnWidth = remember { mutableStateOf(0f) }
-
-    val isZoomAllowed = true
-    val isDragAllowed = true
+    val bgColor = MaterialTheme.colors.surface
 
     CompositionLocalProvider(
         LocalLayoutDirection provides LayoutDirection.Ltr,
@@ -201,8 +199,9 @@ fun LineGraph(plot: LinePlot) {
                 )
                 .pointerInput(Unit, Unit) {
                     detectDragZoomGesture(
-                        isDragAllowed = isDragAllowed,
                         isZoomAllowed = isZoomAllowed,
+                        isDragAllowed = isDragAllowed,
+                        detectDragTimeOut = detectDragTimeOut,
                         onDragStart = {
                             dragOffset.value = it.x
                             isDragging.value = true
@@ -210,7 +209,8 @@ fun LineGraph(plot: LinePlot) {
                             isDragging.value = false
                         }, onZoom = { zoom ->
                             xZoom.value *= zoom
-                        }) { change, _ ->
+                        }
+                    ) { change, _ ->
                         dragOffset.value = change.position.x
                     }
                 },
@@ -225,7 +225,7 @@ fun LineGraph(plot: LinePlot) {
                     val yOffset = availableHeight / allDataPoints.maxOf { it.y }
 
                     val xLastPoint = allDataPoints.maxOf { it.x } * xOffset * xScale + xStart
-                    maxScrollOffset.value = if (xLastPoint > availableWidth) {
+                    maxScrollOffset.value = if (xLastPoint > size.width) {
                         xLastPoint - size.width + paddingRight.toPx() + pointRadius.toPx()
                     } else 0f
                     var xLock = 0f
@@ -320,17 +320,14 @@ fun LineGraph(plot: LinePlot) {
                         Size(paddingRight.toPx(), size.height)
                     )
                 })
-            GraphColumn(
-                Modifier
-                    .align(Alignment.TopStart)
-                    .fillMaxHeight()
-                    .wrapContentWidth()
-                    .onGloballyPositioned {
-                        columnWidth.value = it.size.width.toFloat()
-                    }
-                    //.widthIn(max = 50.dp)
-                    .padding(start = 16.dp, end = 8.dp)
-                , rowHeight.value, globalYScale,
+            GraphColumn(Modifier
+                .align(Alignment.TopStart)
+                .fillMaxHeight()
+                .wrapContentWidth()
+                .onGloballyPositioned {
+                    columnWidth.value = it.size.width.toFloat()
+                }
+                .padding(start = 16.dp, end = 8.dp), rowHeight.value, globalYScale,
                 values = {
                     (0..4).map {
                         val v = it * 25f
@@ -338,8 +335,9 @@ fun LineGraph(plot: LinePlot) {
                     }
                 }
             )
+
             val values = {
-                (0..23).map {
+                (0..2300).map {
                     val v = it.toFloat()
                     Value(v.toInt().toString(), v)
                 }
@@ -349,7 +347,12 @@ fun LineGraph(plot: LinePlot) {
                     .align(Alignment.BottomStart)
                     .fillMaxWidth()
                     .wrapContentHeight()
-                    .clip(RowClip(columnWidth.value - pointRadius.value * LocalDensity.current.density, paddingRight))
+                    .clip(
+                        RowClip(
+                            columnWidth.value - pointRadius.value * LocalDensity.current.density,
+                            paddingRight
+                        )
+                    )
                     .onGloballyPositioned {
                         rowHeight.value = it.size.height.toFloat()
                     }
@@ -365,25 +368,35 @@ fun LineGraph(plot: LinePlot) {
                 ) {
                     values().forEach { (text, i) ->
                         val color = MaterialTheme.colors.onSurface
-                        Column {
-                            val isMajor = i.toInt() % 4 == 0
-                            val radius = if (isMajor) 20f else 10f
-                            Canvas(
-                                modifier = Modifier
-                                    .align(Alignment.CenterHorizontally)
-                                    .height(20.dp),
-                                onDraw = {
-                                    drawCircle(color = color, radius, Offset(0f, 40f))
-                                })
-                            if (isMajor) {
-                                Text(
-                                    text = text,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis,
-                                    style = MaterialTheme.typography.caption,
-                                    color = MaterialTheme.colors.onSurface
-                                )
+                        val density = LocalDensity.current.density
+
+                        // FIXME Only create composable that can be rendered on screen
+                        if (i >= 0f && i < 50f) {
+                            Column {
+                                val isMajor = i.toInt() % 4 == 0
+                                val radius = if (isMajor) 6f else 3f
+                                Canvas(
+                                    modifier = Modifier
+                                        .align(Alignment.CenterHorizontally)
+                                        .height(20.dp),
+                                    onDraw = {
+                                        drawCircle(
+                                            color = color,
+                                            radius * density,
+                                            Offset(0f, 10f * density)
+                                        )
+                                    })
+                                if (isMajor) {
+                                    Text(
+                                        text = text,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                        style = MaterialTheme.typography.caption,
+                                        color = MaterialTheme.colors.onSurface
+                                    )
+                                }
                             }
+
                         }
                     }
                 }

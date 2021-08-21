@@ -1,6 +1,5 @@
 package com.madrapps.plot
 
-import android.util.Log
 import androidx.compose.foundation.gestures.*
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.*
@@ -12,6 +11,7 @@ import kotlin.math.abs
 suspend fun PointerInputScope.detectDragZoomGesture(
     isZoomAllowed: Boolean = false,
     isDragAllowed: Boolean = true,
+    detectDragTimeOut: Long,
     onDragStart: (Offset) -> Unit = { },
     onDragEnd: () -> Unit = { },
     onZoom: (zoom: Float) -> Unit,
@@ -68,7 +68,7 @@ suspend fun PointerInputScope.detectDragZoomGesture(
 
             if (isDragAllowed) {
                 try {
-                    val drag = awaitLongPressOrCancellation1(down)
+                    val drag = awaitLongPressOrCancellation(down, detectDragTimeOut)
                     if (drag != null) {
                         onDragStart.invoke(drag.position)
                         awaitPointerEventScope {
@@ -100,12 +100,12 @@ suspend fun PointerInputScope.detectDragZoomGesture(
 }
 
 
-private suspend fun PointerInputScope.awaitLongPressOrCancellation1(
-    initialDown: PointerInputChange
+private suspend fun PointerInputScope.awaitLongPressOrCancellation(
+    initialDown: PointerInputChange,
+    longPressTimeout: Long
 ): PointerInputChange? {
     var longPress: PointerInputChange? = null
     var currentDown = initialDown
-    val longPressTimeout = 50L
     return try {
         // wait for first tap up or long press
         withTimeout(longPressTimeout) {
