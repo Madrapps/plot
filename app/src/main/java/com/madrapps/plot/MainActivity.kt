@@ -153,7 +153,8 @@ fun LineGraph(plot: LinePlot) {
     val lines = plot.lines
 
     // Graph Line properties
-    val pointRadius = 6.dp
+    val paddingTop = 16.dp
+    val paddingLeft = 6.dp
 
     // Overall Graph properties
     val paddingRight = 16.dp
@@ -223,18 +224,18 @@ fun LineGraph(plot: LinePlot) {
                     val xOffset = 20.dp.toPx() * xZoom.value
                     val allDataPoints = lines.flatMap { it.dataPoints }
                     val yOffset =
-                        ((yBottom - pointRadius.toPx()) / allDataPoints.maxOf { it.y }) * globalYScale
+                        ((yBottom - paddingTop.toPx()) / allDataPoints.maxOf { it.y }) * globalYScale
 
                     val xLastPoint = allDataPoints.maxOf { it.x } * xOffset + xLeft
                     maxScrollOffset.value = if (xLastPoint > size.width) {
-                        xLastPoint - size.width + paddingRight.toPx() + pointRadius.toPx()
+                        xLastPoint - size.width + paddingRight.toPx() + paddingLeft.toPx()
                     } else 0f
 
                     val dragLocks = mutableMapOf<Line, Offset>()
 
                     // Draw Grid lines
                     val region =
-                        Rect(xLeft, pointRadius.toPx(), size.width - paddingRight.toPx(), yBottom)
+                        Rect(xLeft, paddingTop.toPx(), size.width - paddingRight.toPx(), yBottom)
                     plot.grid?.draw?.invoke(this, region, xOffset, yOffset)
 
                     // Draw Lines and Points and AreaUnderLine
@@ -302,7 +303,7 @@ fun LineGraph(plot: LinePlot) {
                     drawRect(
                         bgColor,
                         Offset(0f, 0f),
-                        Size(xLeft - pointRadius.toPx(), size.height)
+                        Size(xLeft - paddingLeft.toPx(), size.height)
                     )
 
                     // Draw right padding
@@ -316,7 +317,7 @@ fun LineGraph(plot: LinePlot) {
                     if (isDragging.value) {
                         // Draw Drag Line highlight
                         dragLocks.values.firstOrNull()?.let { (x, _) ->
-                            if (x >= xLeft - pointRadius.toPx() && x <= size.width - paddingRight.toPx()) {
+                            if (x >= xLeft - paddingLeft.toPx() && x <= size.width - paddingRight.toPx()) {
                                 plot.dragSelection?.draw?.invoke(
                                     this,
                                     Offset(x, yBottom),
@@ -328,7 +329,7 @@ fun LineGraph(plot: LinePlot) {
                         dragLocks.entries.forEach { (line, lock) ->
                             val highlight = line.highlight
                             val x = lock.x
-                            if (x >= xLeft - pointRadius.toPx() && x <= size.width - paddingRight.toPx()) {
+                            if (x >= xLeft - paddingLeft.toPx() && x <= size.width - paddingRight.toPx()) {
                                 highlight?.draw?.invoke(this, lock)
                             }
                         }
@@ -342,7 +343,7 @@ fun LineGraph(plot: LinePlot) {
                     columnWidth.value = it.size.width.toFloat()
                 }
                 .padding(start = 16.dp, end = 8.dp),
-                paddingTop = pointRadius.value * LocalDensity.current.density,
+                paddingTop = paddingTop.value * LocalDensity.current.density,
                 paddingBottom = rowHeight.value,
                 globalYScale,
                 values = {
@@ -366,7 +367,7 @@ fun LineGraph(plot: LinePlot) {
                     .wrapContentHeight()
                     .clip(
                         RowClip(
-                            columnWidth.value - pointRadius.value * LocalDensity.current.density,
+                            columnWidth.value - paddingLeft.value * LocalDensity.current.density,
                             paddingRight
                         )
                     )
