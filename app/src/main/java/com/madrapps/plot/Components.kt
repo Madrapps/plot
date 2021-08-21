@@ -29,7 +29,7 @@ data class LinePlot(
         strokeWidth = 2.dp,
         pathEffect = PathEffect.dashPathEffect(floatArrayOf(40f, 20f))
     ),
-    val row: Row = Row("1", "2"),
+    val row: Row = Row(),
     val column: Column = Column()
 ) {
     data class Line(
@@ -119,8 +119,9 @@ data class LinePlot(
     )
 
     data class Row(
-        val size: String,
-        val help: String,
+        val steps: Int = 10,
+        val paddingTop: Dp = 8.dp,
+        val paddingBottom: Dp = 8.dp,
         val content: @Composable (String) -> Unit = {
             Text(
                 text = it,
@@ -131,7 +132,6 @@ data class LinePlot(
             )
         }
     )
-
 
     data class Column(
         val steps: Int = 4,

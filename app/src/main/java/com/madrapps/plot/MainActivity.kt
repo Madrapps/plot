@@ -385,7 +385,7 @@ fun LineGraph(plot: LinePlot) {
                     .onGloballyPositioned {
                         rowHeight.value = it.size.height.toFloat()
                     }
-                    .padding(bottom = 8.dp, top = 8.dp),
+                    .padding(bottom = plot.row.paddingBottom, top = plot.row.paddingTop),
                 columnWidth.value + paddingLeft.value * LocalDensity.current.density,
                 offset.value,
                 xZoom.value,
