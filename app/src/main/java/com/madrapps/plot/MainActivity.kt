@@ -85,12 +85,12 @@ private val dataPoints2 = listOf(
     DataPoint(4f, 100f),
     DataPoint(5f, 80f),
     DataPoint(6f, 75f),
-//    DataPoint(7f, 50f),
-//    DataPoint(8f, 80f),
-//    DataPoint(9f, 70f),
-//    DataPoint(10f, 0f),
-//    DataPoint(11f, 0f),
-//    DataPoint(12f, 45f),
+    DataPoint(7f, 50f),
+    DataPoint(8f, 80f),
+    DataPoint(9f, 70f),
+    DataPoint(10f, 0f),
+    DataPoint(11f, 0f),
+    DataPoint(12f, 45f),
     DataPoint(13f, 20f),
     DataPoint(14f, 40f),
     DataPoint(15f, 75f),
@@ -156,7 +156,7 @@ fun LineGraph(plot: LinePlot) {
     val pointRadius = 6.dp
 
     // Overall Graph properties
-    val paddingRight = 46.dp
+    val paddingRight = 16.dp
     val globalXScale = 1f
     val globalYScale = 0.9f
     val xAxisText: String? = "Time (in hours)"
@@ -231,7 +231,7 @@ fun LineGraph(plot: LinePlot) {
                         xLastPoint - size.width + paddingRight.toPx() + pointRadius.toPx()
                     } else 0f
 
-                    val dragLocks = mutableMapOf<Line, DragLock>()
+                    val dragLocks = mutableMapOf<Line, Offset>()
 
                     // Draw Grid lines
                     val region = Rect(xStart, yStart, size.width, availableHeight)
@@ -241,7 +241,6 @@ fun LineGraph(plot: LinePlot) {
                     lines.forEach { line ->
                         val intersection = line.intersection
                         val connection = line.connection
-                        val highlight = line.highlight
                         val areaUnderLine = line.areaUnderLine
 
                         // Draw area under curve
@@ -290,8 +289,7 @@ fun LineGraph(plot: LinePlot) {
                             }
                             curOffset?.let {
                                 if (isDragging.value && (dragOffset.value) > it.x - (xOffset * xScale) / 2 && (dragOffset.value) < it.x + (xOffset * xScale) / 2) {
-                                    dragLocks[line] = DragLock(it.x, it.y)
-                                    highlight?.draw?.invoke(this, it)
+                                    dragLocks[line] = it
                                 } else {
                                     intersection?.draw?.invoke(this, it)
                                 }
@@ -324,21 +322,16 @@ fun LineGraph(plot: LinePlot) {
                                     Offset(x, availableHeight),
                                     Offset(x, 0f)
                                 )
-                                Log.d("RONNY", "Draw Sel = $x")
-                            } else {
-                                Log.d("RONNY", "Draw Sel Cancel = $x")
                             }
                         }
-//                        dragLocks.entries.forEach { (line, lock) ->
-//                            val xLock = lock.x
-//                            if (xLock >= xStart - pointRadius.toPx()) {
-//                                plot.dragSelection?.draw?.invoke(
-//                                    this,
-//                                    Offset(xLock, availableHeight),
-//                                    Offset(xLock, 0f)
-//                                )
-//                            }
-//                        }
+                        // Draw Point Highlight
+                        dragLocks.entries.forEach { (line, lock) ->
+                            val highlight = line.highlight
+                            val x = lock.x
+                            if (x >= xStart - pointRadius.toPx() && x <= size.width - paddingRight.toPx()) {
+                                highlight?.draw?.invoke(this, lock)
+                            }
+                        }
                     }
 
                 })
@@ -464,5 +457,3 @@ fun DefaultPreview() {
         )
     }
 }
-
-data class DragLock(val x: Float = -100f, val y: Float = -100f)
