@@ -1,6 +1,7 @@
 package com.madrapps.plot
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Canvas
@@ -84,12 +85,12 @@ private val dataPoints2 = listOf(
     DataPoint(4f, 100f),
     DataPoint(5f, 80f),
     DataPoint(6f, 75f),
-    DataPoint(7f, 50f),
-    DataPoint(8f, 80f),
-    DataPoint(9f, 70f),
-    DataPoint(10f, 0f),
-    DataPoint(11f, 0f),
-    DataPoint(12f, 45f),
+//    DataPoint(7f, 50f),
+//    DataPoint(8f, 80f),
+//    DataPoint(9f, 70f),
+//    DataPoint(10f, 0f),
+//    DataPoint(11f, 0f),
+//    DataPoint(12f, 45f),
     DataPoint(13f, 20f),
     DataPoint(14f, 40f),
     DataPoint(15f, 75f),
@@ -121,7 +122,7 @@ class MainActivity : ComponentActivity() {
                                     dataPoints1,
                                     Connection(Color.Blue, 3.dp),
                                     Intersection(Color.Blue, 6.dp),
-                                    Intersection(Color.Red, 4.dp),
+                                    Intersection(Color.Red, 12.dp),
                                     AreaUnderLine(Color.Blue, 0.1f)
                                 ),
                                 Line(
@@ -155,7 +156,7 @@ fun LineGraph(plot: LinePlot) {
     val pointRadius = 6.dp
 
     // Overall Graph properties
-    val paddingRight = 16.dp
+    val paddingRight = 46.dp
     val globalXScale = 1f
     val globalYScale = 0.9f
     val xAxisText: String? = "Time (in hours)"
@@ -205,6 +206,7 @@ fun LineGraph(plot: LinePlot) {
                         onDragStart = {
                             dragOffset.value = it.x
                             isDragging.value = true
+                            Log.d("RONNY", "DragStart = $it")
                         }, onDragEnd = {
                             isDragging.value = false
                         }, onZoom = { zoom ->
@@ -212,12 +214,12 @@ fun LineGraph(plot: LinePlot) {
                         }
                     ) { change, _ ->
                         dragOffset.value = change.position.x
+                        Log.d("RONNY", "DragMove = ${change.position}")
                     }
                 },
                 onDraw = {
                     val xStart = columnWidth.value
                     val yStart = rowHeight.value
-                    val availableWidth = (size.width - xStart)
                     val availableHeight = size.height - yStart
                     val xScale = 1f * xZoom.value
                     val xOffset = 20.dp.toPx()
@@ -228,7 +230,8 @@ fun LineGraph(plot: LinePlot) {
                     maxScrollOffset.value = if (xLastPoint > size.width) {
                         xLastPoint - size.width + paddingRight.toPx() + pointRadius.toPx()
                     } else 0f
-                    var xLock = 0f
+
+                    val dragLocks = mutableMapOf<Line, DragLock>()
 
                     // Draw Grid lines
                     val region = Rect(xStart, yStart, size.width, availableHeight)
@@ -287,7 +290,7 @@ fun LineGraph(plot: LinePlot) {
                             }
                             curOffset?.let {
                                 if (isDragging.value && (dragOffset.value) > it.x - (xOffset * xScale) / 2 && (dragOffset.value) < it.x + (xOffset * xScale) / 2) {
-                                    xLock = it.x
+                                    dragLocks[line] = DragLock(it.x, it.y)
                                     highlight?.draw?.invoke(this, it)
                                 } else {
                                     intersection?.draw?.invoke(this, it)
@@ -295,15 +298,6 @@ fun LineGraph(plot: LinePlot) {
                             }
                             curOffset = nextOffset
                         }
-                    }
-
-                    // Draw Drag line
-                    if (isDragging.value) {
-                        plot.dragSelection?.draw?.invoke(
-                            this,
-                            Offset(xLock, availableHeight),
-                            Offset(xLock, 0f)
-                        )
                     }
 
                     // Draw column
@@ -319,6 +313,34 @@ fun LineGraph(plot: LinePlot) {
                         Offset(size.width - paddingRight.toPx(), 0f),
                         Size(paddingRight.toPx(), size.height)
                     )
+
+                    // Draw drag selection Highlight
+                    if (isDragging.value) {
+                        // Draw Drag Line highlight
+                        dragLocks.values.firstOrNull()?.let { (x, _) ->
+                            if (x >= xStart - pointRadius.toPx() && x <= size.width - paddingRight.toPx()) {
+                                plot.dragSelection?.draw?.invoke(
+                                    this,
+                                    Offset(x, availableHeight),
+                                    Offset(x, 0f)
+                                )
+                                Log.d("RONNY", "Draw Sel = $x")
+                            } else {
+                                Log.d("RONNY", "Draw Sel Cancel = $x")
+                            }
+                        }
+//                        dragLocks.entries.forEach { (line, lock) ->
+//                            val xLock = lock.x
+//                            if (xLock >= xStart - pointRadius.toPx()) {
+//                                plot.dragSelection?.draw?.invoke(
+//                                    this,
+//                                    Offset(xLock, availableHeight),
+//                                    Offset(xLock, 0f)
+//                                )
+//                            }
+//                        }
+                    }
+
                 })
             GraphColumn(Modifier
                 .align(Alignment.TopStart)
@@ -442,3 +464,5 @@ fun DefaultPreview() {
         )
     }
 }
+
+data class DragLock(val x: Float = -100f, val y: Float = -100f)
