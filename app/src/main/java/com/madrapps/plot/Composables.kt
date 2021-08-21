@@ -12,7 +12,8 @@ import androidx.compose.ui.unit.Dp
 @Composable
 fun GraphColumn(
     modifier: Modifier,
-    yStart: Float,
+    paddingTop: Float,
+    paddingBottom: Float,
     scale: Float,
     color: Color = MaterialTheme.colors.onSurface,
     values: () -> List<Value> = { listOf(Value("0", 0f)) },
@@ -42,8 +43,9 @@ fun GraphColumn(
         }
         val width = placeables.maxOf { it.width }
         layout(width, constraints.maxHeight) {
-            val availableHeight = (constraints.maxHeight - yStart)
-            var yPos = availableHeight.toInt()
+            val yBottom = (constraints.maxHeight - paddingBottom)
+            val availableHeight = yBottom - paddingTop
+            var yPos = yBottom.toInt()
 
             placeables.forEach { placeable ->
                 yPos -= (placeable.height / 2f).toInt() + 1

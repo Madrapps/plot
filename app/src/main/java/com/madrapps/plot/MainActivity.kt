@@ -218,14 +218,14 @@ fun LineGraph(plot: LinePlot) {
                     }
                 },
                 onDraw = {
-                    val xStart = columnWidth.value
-                    val yStart = rowHeight.value
-                    val availableHeight = size.height - yStart
+                    val xLeft = columnWidth.value
+                    val yBottom = size.height - rowHeight.value
                     val xOffset = 20.dp.toPx() * xZoom.value
                     val allDataPoints = lines.flatMap { it.dataPoints }
-                    val yOffset = ((availableHeight - pointRadius.toPx()) / allDataPoints.maxOf { it.y }) * globalYScale
+                    val yOffset =
+                        ((yBottom - pointRadius.toPx()) / allDataPoints.maxOf { it.y }) * globalYScale
 
-                    val xLastPoint = allDataPoints.maxOf { it.x } * xOffset + xStart
+                    val xLastPoint = allDataPoints.maxOf { it.x } * xOffset + xLeft
                     maxScrollOffset.value = if (xLastPoint > size.width) {
                         xLastPoint - size.width + paddingRight.toPx() + pointRadius.toPx()
                     } else 0f
@@ -233,7 +233,8 @@ fun LineGraph(plot: LinePlot) {
                     val dragLocks = mutableMapOf<Line, Offset>()
 
                     // Draw Grid lines
-                    val region = Rect(xStart, pointRadius.toPx(), size.width - paddingRight.toPx(), availableHeight)
+                    val region =
+                        Rect(xLeft, pointRadius.toPx(), size.width - paddingRight.toPx(), yBottom)
                     plot.grid?.draw?.invoke(this, region, xOffset, yOffset)
 
                     // Draw Lines and Points and AreaUnderLine
@@ -245,8 +246,8 @@ fun LineGraph(plot: LinePlot) {
                         // Draw area under curve
                         if (areaUnderLine != null) {
                             val points = line.dataPoints.map { (x, y) ->
-                                val x1 = (x * xOffset) + xStart - offset.value
-                                val y1 = availableHeight - (y * yOffset)
+                                val x1 = (x * xOffset) + xLeft - offset.value
+                                val y1 = yBottom - (y * yOffset)
                                 Offset(x1, y1)
                             }
                             val p = Path()
@@ -269,14 +270,14 @@ fun LineGraph(plot: LinePlot) {
                         line.dataPoints.forEachIndexed { i, _ ->
                             if (i == 0) {
                                 val (x, y) = line.dataPoints[i]
-                                val x1 = (x * xOffset) + xStart - offset.value
-                                val y1 = availableHeight - (y * yOffset)
+                                val x1 = (x * xOffset) + xLeft - offset.value
+                                val y1 = yBottom - (y * yOffset)
                                 curOffset = Offset(x1, y1)
                             }
                             if (line.dataPoints.indices.contains(i + 1)) {
                                 val (x, y) = line.dataPoints[i + 1]
-                                val x2 = (x * xOffset) + xStart - offset.value
-                                val y2 = availableHeight - (y * yOffset)
+                                val x2 = (x * xOffset) + xLeft - offset.value
+                                val y2 = yBottom - (y * yOffset)
                                 nextOffset = Offset(x2, y2)
                             }
                             if (nextOffset != null && curOffset != null) {
@@ -301,7 +302,7 @@ fun LineGraph(plot: LinePlot) {
                     drawRect(
                         bgColor,
                         Offset(0f, 0f),
-                        Size(xStart - pointRadius.toPx(), size.height)
+                        Size(xLeft - pointRadius.toPx(), size.height)
                     )
 
                     // Draw right padding
@@ -315,10 +316,10 @@ fun LineGraph(plot: LinePlot) {
                     if (isDragging.value) {
                         // Draw Drag Line highlight
                         dragLocks.values.firstOrNull()?.let { (x, _) ->
-                            if (x >= xStart - pointRadius.toPx() && x <= size.width - paddingRight.toPx()) {
+                            if (x >= xLeft - pointRadius.toPx() && x <= size.width - paddingRight.toPx()) {
                                 plot.dragSelection?.draw?.invoke(
                                     this,
-                                    Offset(x, availableHeight),
+                                    Offset(x, yBottom),
                                     Offset(x, 0f)
                                 )
                             }
@@ -327,7 +328,7 @@ fun LineGraph(plot: LinePlot) {
                         dragLocks.entries.forEach { (line, lock) ->
                             val highlight = line.highlight
                             val x = lock.x
-                            if (x >= xStart - pointRadius.toPx() && x <= size.width - paddingRight.toPx()) {
+                            if (x >= xLeft - pointRadius.toPx() && x <= size.width - paddingRight.toPx()) {
                                 highlight?.draw?.invoke(this, lock)
                             }
                         }
@@ -340,7 +341,10 @@ fun LineGraph(plot: LinePlot) {
                 .onGloballyPositioned {
                     columnWidth.value = it.size.width.toFloat()
                 }
-                .padding(start = 16.dp, end = 8.dp), rowHeight.value, globalYScale,
+                .padding(start = 16.dp, end = 8.dp),
+                paddingTop = pointRadius.value * LocalDensity.current.density,
+                paddingBottom = rowHeight.value,
+                globalYScale,
                 values = {
                     (0..4).map {
                         val v = it * 25f
