@@ -100,12 +100,14 @@ data class LinePlot(
             (0 until steps).forEach {
                 val y = it * 25f
                 val y1 = bottom - (y * yOffset)
-                drawLine(
-                    color,
-                    Offset(left, y1),
-                    Offset(right, y1),
-                    lineWidth.toPx()
-                )
+                if (y1 >= top) {
+                    drawLine(
+                        color,
+                        Offset(left, y1),
+                        Offset(right, y1),
+                        lineWidth.toPx()
+                    )
+                }
             }
         }
     )

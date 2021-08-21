@@ -158,7 +158,7 @@ fun LineGraph(plot: LinePlot) {
     // Overall Graph properties
     val paddingRight = 16.dp
     val globalXScale = 1f
-    val globalYScale = 0.9f
+    val globalYScale = 1f
     val xAxisText: String? = "Time (in hours)"
 
     val isZoomAllowed = true
@@ -223,7 +223,7 @@ fun LineGraph(plot: LinePlot) {
                     val availableHeight = size.height - yStart
                     val xOffset = 20.dp.toPx() * xZoom.value
                     val allDataPoints = lines.flatMap { it.dataPoints }
-                    val yOffset = (availableHeight / allDataPoints.maxOf { it.y }) * globalYScale
+                    val yOffset = ((availableHeight - pointRadius.toPx()) / allDataPoints.maxOf { it.y }) * globalYScale
 
                     val xLastPoint = allDataPoints.maxOf { it.x } * xOffset + xStart
                     maxScrollOffset.value = if (xLastPoint > size.width) {
@@ -233,7 +233,7 @@ fun LineGraph(plot: LinePlot) {
                     val dragLocks = mutableMapOf<Line, Offset>()
 
                     // Draw Grid lines
-                    val region = Rect(xStart, yStart, size.width, availableHeight)
+                    val region = Rect(xStart, pointRadius.toPx(), size.width - paddingRight.toPx(), availableHeight)
                     plot.grid?.draw?.invoke(this, region, xOffset, yOffset)
 
                     // Draw Lines and Points and AreaUnderLine
