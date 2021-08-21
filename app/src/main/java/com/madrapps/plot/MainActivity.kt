@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
@@ -37,7 +36,6 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -47,6 +45,9 @@ import com.madrapps.plot.LinePlot.Grid
 import com.madrapps.plot.LinePlot.Intersection
 import com.madrapps.plot.LinePlot.Line
 import com.madrapps.plot.ui.theme.PlotTheme
+import kotlin.math.ceil
+import kotlin.math.floor
+import kotlin.math.roundToInt
 
 private val dataPoints1 = listOf(
     DataPoint(0f, 0f),
@@ -60,7 +61,7 @@ private val dataPoints1 = listOf(
     DataPoint(8f, 80f),
     DataPoint(9f, 75f),
     DataPoint(10f, 55f),
-    DataPoint(11f, 45f),
+    DataPoint(11f, 45f), // FIXME :Bug: Change this to -45f. Graph doesn't adapt.
     DataPoint(12f, 50f),
     DataPoint(13f, 80f),
     DataPoint(14f, 70f),
@@ -336,24 +337,32 @@ fun LineGraph(plot: LinePlot) {
                         }
                     }
                 })
-            GraphColumn(Modifier
-                .align(Alignment.TopStart)
-                .fillMaxHeight()
-                .wrapContentWidth()
-                .onGloballyPositioned {
-                    columnWidth.value = it.size.width.toFloat()
-                }
-                .padding(start = 16.dp, end = 8.dp),
+            GraphColumn(
+                Modifier
+                    .align(Alignment.TopStart)
+                    .fillMaxHeight()
+                    .wrapContentWidth()
+                    .onGloballyPositioned {
+                        columnWidth.value = it.size.width.toFloat()
+                    }
+                    .padding(start = plot.column.paddingStart, end = plot.column.paddingEnd),
                 paddingTop = paddingTop.value * LocalDensity.current.density,
                 paddingBottom = rowHeight.value,
-                globalYScale,
-                values = {
-                    (0..4).map {
-                        val v = it * 25f
-                        Value(v.toInt().toString(), v)
-                    }
+                scale = globalYScale,
+            ) {
+                val steps = plot.column.steps
+                val points = plot.lines.flatMap { it.dataPoints }
+                val min = floor(points.minOf { it.y }).toInt()
+                val max = points.maxOf { it.y }
+
+                val diff = (max - min)
+                val multiple = ceil(diff / steps).roundToInt()
+
+                (0..steps).forEach {
+                    val value = it * multiple + min
+                    plot.column.content(value.toString())
                 }
-            )
+            }
 
             val values = {
                 (0..2300).map {

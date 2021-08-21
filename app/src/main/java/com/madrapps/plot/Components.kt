@@ -30,6 +30,7 @@ data class LinePlot(
         pathEffect = PathEffect.dashPathEffect(floatArrayOf(40f, 20f))
     ),
     val row: Row = Row("1", "2"),
+    val column: Column = Column()
 ) {
     data class Line(
         val dataPoints: List<DataPoint>,
@@ -120,6 +121,22 @@ data class LinePlot(
     data class Row(
         val size: String,
         val help: String,
+        val content: @Composable (String) -> Unit = {
+            Text(
+                text = it,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.caption,
+                color = MaterialTheme.colors.onSurface
+            )
+        }
+    )
+
+
+    data class Column(
+        val steps: Int = 4,
+        val paddingStart: Dp = 16.dp,
+        val paddingEnd: Dp = 8.dp,
         val content: @Composable (String) -> Unit = {
             Text(
                 text = it,

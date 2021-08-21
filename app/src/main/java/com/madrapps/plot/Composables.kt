@@ -15,29 +15,10 @@ fun GraphColumn(
     paddingTop: Float,
     paddingBottom: Float,
     scale: Float,
-    color: Color = MaterialTheme.colors.onSurface,
-    values: () -> List<Value> = { listOf(Value("0", 0f)) },
-    content: @Composable () -> Unit = {
-        values().forEach { (text, _) ->
-            Text(
-                text = text,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                style = MaterialTheme.typography.caption,
-                color = color
-            )
-        }
-    }
+    content: @Composable () -> Unit
 ) {
-    val valueList = values()
-    val steps = valueList.size - 1
-    val min = valueList.first().value
-    val max = valueList.last().value
-    val stepSize = if (steps != 0) {
-        (max - min) / steps
-    } else 0f
-
     Layout(content, modifier) { measurables, constraints ->
+        val steps = if (measurables.size <= 1) 1 else measurables.size - 1
         val placeables = measurables.map { measurable ->
             measurable.measure(constraints.copy(minHeight = 0))
         }
@@ -48,9 +29,9 @@ fun GraphColumn(
             var yPos = yBottom.toInt()
 
             placeables.forEach { placeable ->
-                yPos -= (placeable.height / 2f).toInt() + 1
+                yPos -= (placeable.height / 2f).toInt()
                 placeable.place(x = 0, y = yPos)
-                yPos -= (stepSize * availableHeight / max * scale).toInt() - (placeable.height / 2f).toInt()
+                yPos -= (availableHeight / steps * scale).toInt() - (placeable.height / 2f).toInt()
             }
         }
     }
