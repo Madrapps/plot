@@ -161,7 +161,6 @@ fun LineGraph(plot: LinePlot) {
     val paddingRight = 16.dp
     val globalXScale = 1f
     val globalYScale = 1f
-    val xAxisText: String? = "Time (in hours)"
 
     val isZoomAllowed = true
     val isDragAllowed = true
@@ -220,14 +219,15 @@ fun LineGraph(plot: LinePlot) {
                     }
                 },
                 onDraw = {
-                    val xLeft = columnWidth.value
+                    val xLeft = columnWidth.value + paddingLeft.toPx()
                     val yBottom = size.height - rowHeight.value
                     val xOffset = 20.dp.toPx() * xZoom.value
                     val allDataPoints = lines.flatMap { it.dataPoints }
                     val yOffset =
                         ((yBottom - paddingTop.toPx()) / allDataPoints.maxOf { it.y }) * globalYScale
 
-                    val xLastPoint = allDataPoints.maxOf { it.x } * xOffset + xLeft + paddingLeft.toPx()
+                    val xLastPoint =
+                        allDataPoints.maxOf { it.x } * xOffset + xLeft
                     maxScrollOffset.value = if (xLastPoint > size.width) {
                         xLastPoint - size.width + paddingRight.toPx() + canvasPaddingRight.toPx()
                     } else 0f
@@ -248,7 +248,7 @@ fun LineGraph(plot: LinePlot) {
                         // Draw area under curve
                         if (areaUnderLine != null) {
                             val points = line.dataPoints.map { (x, y) ->
-                                val x1 = (x * xOffset) + xLeft - offset.value + paddingLeft.toPx()
+                                val x1 = (x * xOffset) + xLeft - offset.value
                                 val y1 = yBottom - (y * yOffset)
                                 Offset(x1, y1)
                             }
@@ -272,13 +272,13 @@ fun LineGraph(plot: LinePlot) {
                         line.dataPoints.forEachIndexed { i, _ ->
                             if (i == 0) {
                                 val (x, y) = line.dataPoints[i]
-                                val x1 = (x * xOffset) + xLeft - offset.value + paddingLeft.toPx()
+                                val x1 = (x * xOffset) + xLeft - offset.value
                                 val y1 = yBottom - (y * yOffset)
                                 curOffset = Offset(x1, y1)
                             }
                             if (line.dataPoints.indices.contains(i + 1)) {
                                 val (x, y) = line.dataPoints[i + 1]
-                                val x2 = (x * xOffset) + xLeft - offset.value + paddingLeft.toPx()
+                                val x2 = (x * xOffset) + xLeft - offset.value
                                 val y2 = yBottom - (y * yOffset)
                                 nextOffset = Offset(x2, y2)
                             }
@@ -304,7 +304,7 @@ fun LineGraph(plot: LinePlot) {
                     drawRect(
                         bgColor,
                         Offset(0f, 0f),
-                        Size(xLeft, size.height)
+                        Size(columnWidth.value, size.height)
                     )
 
                     // Draw right padding
@@ -318,7 +318,7 @@ fun LineGraph(plot: LinePlot) {
                     if (isDragging.value) {
                         // Draw Drag Line highlight
                         dragLocks.values.firstOrNull()?.let { (x, _) ->
-                            if (x >= xLeft && x <= size.width - paddingRight.toPx()) {
+                            if (x >= columnWidth.value && x <= size.width - paddingRight.toPx()) {
                                 plot.dragSelection?.draw?.invoke(
                                     this,
                                     Offset(x, yBottom),
@@ -330,7 +330,7 @@ fun LineGraph(plot: LinePlot) {
                         dragLocks.entries.forEach { (line, lock) ->
                             val highlight = line.highlight
                             val x = lock.x
-                            if (x >= xLeft && x <= size.width - paddingRight.toPx()) {
+                            if (x >= columnWidth.value && x <= size.width - paddingRight.toPx()) {
                                 highlight?.draw?.invoke(this, lock)
                             }
                         }
@@ -343,8 +343,7 @@ fun LineGraph(plot: LinePlot) {
                 .onGloballyPositioned {
                     columnWidth.value = it.size.width.toFloat()
                 }
-                .padding(start = 16.dp, end = 8.dp)
-                ,
+                .padding(start = 16.dp, end = 8.dp),
                 paddingTop = paddingTop.value * LocalDensity.current.density,
                 paddingBottom = rowHeight.value,
                 globalYScale,
@@ -362,7 +361,8 @@ fun LineGraph(plot: LinePlot) {
                     Value(v.toInt().toString(), v)
                 }
             }
-            Column(
+
+            GraphRow(
                 Modifier
                     .align(Alignment.BottomStart)
                     .fillMaxWidth()
@@ -376,61 +376,38 @@ fun LineGraph(plot: LinePlot) {
                     .onGloballyPositioned {
                         rowHeight.value = it.size.height.toFloat()
                     }
-                    .padding(bottom = 8.dp, top = 8.dp)
+                    .padding(bottom = 8.dp, top = 8.dp),
+                columnWidth.value + paddingLeft.value * LocalDensity.current.density,
+                offset.value,
+                xZoom.value,
+                values = values,
+                stepSize = 20.dp
             ) {
-                GraphRow(
-                    Modifier,
-                    columnWidth.value + paddingLeft.value * LocalDensity.current.density,
-                    offset.value,
-                    xZoom.value,
-                    values = values,
-                    stepSize = 20.dp
-                ) {
-                    values().forEach { (text, i) ->
-                        val color = MaterialTheme.colors.onSurface
-                        val density = LocalDensity.current.density
+                values().forEach { (text, i) ->
+                    val color = MaterialTheme.colors.onSurface
+                    val density = LocalDensity.current.density
+                    // FIXME Only create composable that can be rendered on screen
 
-                        // FIXME Only create composable that can be rendered on screen
-                        if (i >= 0f && i < 50f) {
-                            Column {
-                                val isMajor = i.toInt() % 4 == 0
-                                val radius = if (isMajor) 6f else 3f
-                                Canvas(
-                                    modifier = Modifier
-                                        .align(Alignment.CenterHorizontally)
-                                        .height(20.dp),
-                                    onDraw = {
-                                        drawCircle(
-                                            color = color,
-                                            radius * density,
-                                            Offset(0f, 10f * density)
-                                        )
-                                    })
-                                if (isMajor) {
-                                    Text(
-                                        text = text,
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis,
-                                        style = MaterialTheme.typography.caption,
-                                        color = MaterialTheme.colors.onSurface
+                    if (i >= 0f && i < 50f) {
+                        Column {
+                            val isMajor = i.toInt() % 4 == 0
+                            val radius = if (isMajor) 6f else 3f
+                            Canvas(
+                                modifier = Modifier
+                                    .align(Alignment.CenterHorizontally)
+                                    .height(20.dp),
+                                onDraw = {
+                                    drawCircle(
+                                        color = color,
+                                        radius * density,
+                                        Offset(0f, 10f * density)
                                     )
-                                }
+                                })
+                            if (isMajor) {
+                                plot.row.content.invoke(text)
                             }
-
                         }
                     }
-                }
-                if (xAxisText != null) {
-                    Text(
-                        modifier = Modifier
-                            .align(Alignment.CenterHorizontally)
-                            .padding(top = 8.dp),
-                        text = xAxisText,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        style = MaterialTheme.typography.subtitle1,
-                        color = MaterialTheme.colors.onSurface
-                    )
                 }
             }
         }

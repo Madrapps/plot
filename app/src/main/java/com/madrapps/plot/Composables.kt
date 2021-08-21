@@ -80,7 +80,7 @@ fun GraphRow(
 ) {
     Layout(content, modifier) { measurables, constraints ->
         val placeables = measurables.map { measurable ->
-            measurable.measure(constraints)
+            measurable.measure(constraints.copy(minWidth = 0))
         }
         val height = placeables.maxOf { it.height }
         layout(constraints.maxWidth, height) {
