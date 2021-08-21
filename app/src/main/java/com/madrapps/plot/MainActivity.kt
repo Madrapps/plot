@@ -155,6 +155,7 @@ fun LineGraph(plot: LinePlot) {
     // Graph Line properties
     val paddingTop = 16.dp
     val paddingLeft = 6.dp
+    val canvasPaddingRight = 6.dp
 
     // Overall Graph properties
     val paddingRight = 16.dp
@@ -226,9 +227,9 @@ fun LineGraph(plot: LinePlot) {
                     val yOffset =
                         ((yBottom - paddingTop.toPx()) / allDataPoints.maxOf { it.y }) * globalYScale
 
-                    val xLastPoint = allDataPoints.maxOf { it.x } * xOffset + xLeft
+                    val xLastPoint = allDataPoints.maxOf { it.x } * xOffset + xLeft + paddingLeft.toPx()
                     maxScrollOffset.value = if (xLastPoint > size.width) {
-                        xLastPoint - size.width + paddingRight.toPx() + paddingLeft.toPx()
+                        xLastPoint - size.width + paddingRight.toPx() + canvasPaddingRight.toPx()
                     } else 0f
 
                     val dragLocks = mutableMapOf<Line, Offset>()
@@ -247,7 +248,7 @@ fun LineGraph(plot: LinePlot) {
                         // Draw area under curve
                         if (areaUnderLine != null) {
                             val points = line.dataPoints.map { (x, y) ->
-                                val x1 = (x * xOffset) + xLeft - offset.value
+                                val x1 = (x * xOffset) + xLeft - offset.value + paddingLeft.toPx()
                                 val y1 = yBottom - (y * yOffset)
                                 Offset(x1, y1)
                             }
@@ -271,13 +272,13 @@ fun LineGraph(plot: LinePlot) {
                         line.dataPoints.forEachIndexed { i, _ ->
                             if (i == 0) {
                                 val (x, y) = line.dataPoints[i]
-                                val x1 = (x * xOffset) + xLeft - offset.value
+                                val x1 = (x * xOffset) + xLeft - offset.value + paddingLeft.toPx()
                                 val y1 = yBottom - (y * yOffset)
                                 curOffset = Offset(x1, y1)
                             }
                             if (line.dataPoints.indices.contains(i + 1)) {
                                 val (x, y) = line.dataPoints[i + 1]
-                                val x2 = (x * xOffset) + xLeft - offset.value
+                                val x2 = (x * xOffset) + xLeft - offset.value + paddingLeft.toPx()
                                 val y2 = yBottom - (y * yOffset)
                                 nextOffset = Offset(x2, y2)
                             }
@@ -303,7 +304,7 @@ fun LineGraph(plot: LinePlot) {
                     drawRect(
                         bgColor,
                         Offset(0f, 0f),
-                        Size(xLeft - paddingLeft.toPx(), size.height)
+                        Size(xLeft, size.height)
                     )
 
                     // Draw right padding
@@ -317,7 +318,7 @@ fun LineGraph(plot: LinePlot) {
                     if (isDragging.value) {
                         // Draw Drag Line highlight
                         dragLocks.values.firstOrNull()?.let { (x, _) ->
-                            if (x >= xLeft - paddingLeft.toPx() && x <= size.width - paddingRight.toPx()) {
+                            if (x >= xLeft && x <= size.width - paddingRight.toPx()) {
                                 plot.dragSelection?.draw?.invoke(
                                     this,
                                     Offset(x, yBottom),
@@ -329,7 +330,7 @@ fun LineGraph(plot: LinePlot) {
                         dragLocks.entries.forEach { (line, lock) ->
                             val highlight = line.highlight
                             val x = lock.x
-                            if (x >= xLeft - paddingLeft.toPx() && x <= size.width - paddingRight.toPx()) {
+                            if (x >= xLeft && x <= size.width - paddingRight.toPx()) {
                                 highlight?.draw?.invoke(this, lock)
                             }
                         }
@@ -342,7 +343,8 @@ fun LineGraph(plot: LinePlot) {
                 .onGloballyPositioned {
                     columnWidth.value = it.size.width.toFloat()
                 }
-                .padding(start = 16.dp, end = 8.dp),
+                .padding(start = 16.dp, end = 8.dp)
+                ,
                 paddingTop = paddingTop.value * LocalDensity.current.density,
                 paddingBottom = rowHeight.value,
                 globalYScale,
@@ -367,7 +369,7 @@ fun LineGraph(plot: LinePlot) {
                     .wrapContentHeight()
                     .clip(
                         RowClip(
-                            columnWidth.value - paddingLeft.value * LocalDensity.current.density,
+                            columnWidth.value,
                             paddingRight
                         )
                     )
@@ -378,7 +380,7 @@ fun LineGraph(plot: LinePlot) {
             ) {
                 GraphRow(
                     Modifier,
-                    columnWidth.value,
+                    columnWidth.value + paddingLeft.value * LocalDensity.current.density,
                     offset.value,
                     xZoom.value,
                     values = values,
