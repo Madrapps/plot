@@ -221,12 +221,11 @@ fun LineGraph(plot: LinePlot) {
                     val xStart = columnWidth.value
                     val yStart = rowHeight.value
                     val availableHeight = size.height - yStart
-                    val xScale = 1f * xZoom.value
-                    val xOffset = 20.dp.toPx()
+                    val xOffset = 20.dp.toPx() * xZoom.value
                     val allDataPoints = lines.flatMap { it.dataPoints }
-                    val yOffset = availableHeight / allDataPoints.maxOf { it.y }
+                    val yOffset = (availableHeight / allDataPoints.maxOf { it.y }) * globalYScale
 
-                    val xLastPoint = allDataPoints.maxOf { it.x } * xOffset * xScale + xStart
+                    val xLastPoint = allDataPoints.maxOf { it.x } * xOffset + xStart
                     maxScrollOffset.value = if (xLastPoint > size.width) {
                         xLastPoint - size.width + paddingRight.toPx() + pointRadius.toPx()
                     } else 0f
@@ -235,7 +234,7 @@ fun LineGraph(plot: LinePlot) {
 
                     // Draw Grid lines
                     val region = Rect(xStart, yStart, size.width, availableHeight)
-                    plot.grid?.draw?.invoke(this, region, xOffset * xScale, yOffset * globalYScale)
+                    plot.grid?.draw?.invoke(this, region, xOffset, yOffset)
 
                     // Draw Lines and Points and AreaUnderLine
                     lines.forEach { line ->
@@ -246,8 +245,8 @@ fun LineGraph(plot: LinePlot) {
                         // Draw area under curve
                         if (areaUnderLine != null) {
                             val points = line.dataPoints.map { (x, y) ->
-                                val x1 = (x * xOffset * xScale) + xStart - offset.value
-                                val y1 = availableHeight - (y * yOffset * globalYScale)
+                                val x1 = (x * xOffset) + xStart - offset.value
+                                val y1 = availableHeight - (y * yOffset)
                                 Offset(x1, y1)
                             }
                             val p = Path()
@@ -270,14 +269,14 @@ fun LineGraph(plot: LinePlot) {
                         line.dataPoints.forEachIndexed { i, _ ->
                             if (i == 0) {
                                 val (x, y) = line.dataPoints[i]
-                                val x1 = (x * xOffset * xScale) + xStart - offset.value
-                                val y1 = availableHeight - (y * yOffset * globalYScale)
+                                val x1 = (x * xOffset) + xStart - offset.value
+                                val y1 = availableHeight - (y * yOffset)
                                 curOffset = Offset(x1, y1)
                             }
                             if (line.dataPoints.indices.contains(i + 1)) {
                                 val (x, y) = line.dataPoints[i + 1]
-                                val x2 = (x * xOffset * xScale) + xStart - offset.value
-                                val y2 = availableHeight - (y * yOffset * globalYScale)
+                                val x2 = (x * xOffset) + xStart - offset.value
+                                val y2 = availableHeight - (y * yOffset)
                                 nextOffset = Offset(x2, y2)
                             }
                             if (nextOffset != null && curOffset != null) {
@@ -288,7 +287,7 @@ fun LineGraph(plot: LinePlot) {
                                 )
                             }
                             curOffset?.let {
-                                if (isDragging.value && (dragOffset.value) > it.x - (xOffset * xScale) / 2 && (dragOffset.value) < it.x + (xOffset * xScale) / 2) {
+                                if (isDragging.value && (dragOffset.value) > it.x - xOffset / 2 && (dragOffset.value) < it.x + xOffset / 2) {
                                     dragLocks[line] = it
                                 } else {
                                     intersection?.draw?.invoke(this, it)
@@ -333,7 +332,6 @@ fun LineGraph(plot: LinePlot) {
                             }
                         }
                     }
-
                 })
             GraphColumn(Modifier
                 .align(Alignment.TopStart)
@@ -377,7 +375,7 @@ fun LineGraph(plot: LinePlot) {
                     Modifier,
                     columnWidth.value,
                     offset.value,
-                    1f * xZoom.value,
+                    xZoom.value,
                     values = values,
                     stepSize = 20.dp
                 ) {
