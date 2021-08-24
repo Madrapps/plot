@@ -1,4 +1,4 @@
-package com.madrapps.plot
+package com.madrapps.sample
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier

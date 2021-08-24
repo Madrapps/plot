@@ -7,5 +7,5 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "plot"
-include(":app")
+include(":sample")
  

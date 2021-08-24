@@ -1,4 +1,4 @@
-package com.madrapps.plot.ui.theme
+package com.madrapps.sample.ui.theme
 
 import androidx.compose.material.Typography
 import androidx.compose.ui.text.TextStyle

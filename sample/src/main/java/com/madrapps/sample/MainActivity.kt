@@ -1,4 +1,4 @@
-package com.madrapps.plot
+package com.madrapps.sample
 
 import android.os.Bundle
 import android.util.Log
@@ -38,13 +38,13 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import com.madrapps.plot.LinePlot.AreaUnderLine
-import com.madrapps.plot.LinePlot.Connection
-import com.madrapps.plot.LinePlot.Grid
-import com.madrapps.plot.LinePlot.Highlight
-import com.madrapps.plot.LinePlot.Intersection
-import com.madrapps.plot.LinePlot.Line
-import com.madrapps.plot.ui.theme.PlotTheme
+import com.madrapps.sample.LinePlot.AreaUnderLine
+import com.madrapps.sample.LinePlot.Connection
+import com.madrapps.sample.LinePlot.Grid
+import com.madrapps.sample.LinePlot.Highlight
+import com.madrapps.sample.LinePlot.Intersection
+import com.madrapps.sample.LinePlot.Line
+import com.madrapps.sample.ui.theme.PlotTheme
 import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.roundToInt
