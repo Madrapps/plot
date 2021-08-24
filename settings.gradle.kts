@@ -8,4 +8,4 @@ dependencyResolutionManagement {
 }
 rootProject.name = "plot"
 include(":sample")
- 
+include(":plot")
