@@ -1,4 +1,4 @@
-package com.madrapps.sample
+package com.madrapps.plot
 
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
