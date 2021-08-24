@@ -153,10 +153,9 @@ data class LinePlot(
         val paddingTop: Dp = 8.dp,
         val paddingBottom: Dp = 8.dp,
         val roundToInt: Boolean = true,
-        val content: @Composable (Int, Int) -> Unit = { min, offset ->
-            (0 until steps).forEach {
+        val content: @Composable (Int, Int, Float) -> Unit = { min, offset, max ->
+            for (it in 0 until steps) {
                 val value = it * offset + min
-
                 androidx.compose.foundation.layout.Column {
                     val isMajor = value % 4 == 0
                     val radius = if (isMajor) 6f else 3f
@@ -181,6 +180,9 @@ data class LinePlot(
                             color = color
                         )
                     }
+                }
+                if (value > max) {
+                    break
                 }
             }
         }

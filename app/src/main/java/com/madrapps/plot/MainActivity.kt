@@ -394,7 +394,7 @@ fun LineGraph(plot: LinePlot) {
                 xZoom.value * rowScale,
                 stepSize = plot.row.stepSize,
             ) {
-                plot.row.content.invoke(min, rowScale)
+                plot.row.content.invoke(min, rowScale, max)
             }
         }
     }
