@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import com.madrapps.plot.LinePlot.AreaUnderLine
 import com.madrapps.plot.LinePlot.Connection
 import com.madrapps.plot.LinePlot.Grid
+import com.madrapps.plot.LinePlot.Highlight
 import com.madrapps.plot.LinePlot.Intersection
 import com.madrapps.plot.LinePlot.Line
 import com.madrapps.plot.ui.theme.PlotTheme
@@ -124,19 +125,19 @@ class MainActivity : ComponentActivity() {
                                     dataPoints1,
                                     Connection(Color.Blue, 3.dp),
                                     Intersection(Color.Blue, 6.dp),
-                                    Intersection(Color.Red, 12.dp),
+                                    Highlight(Color.Red, 12.dp),
                                     AreaUnderLine(Color.Blue, 0.1f)
                                 ),
                                 Line(
                                     dataPoints2,
 //                                    dataPoints2.map { DataPoint(it.x * 2, it.y) },
                                     Connection(Color.Gray, 2.dp),
-                                    Intersection { center ->
+                                    Intersection { center, _ ->
                                         val px = 4.dp.toPx()
                                         val topLeft = Offset(center.x - px, center.y - px)
                                         drawRect(Color.Gray, topLeft, Size(px * 2, px * 2))
                                     },
-                                    Intersection { center ->
+                                    Highlight { center ->
                                         val px = 4.dp.toPx()
                                         val topLeft = Offset(center.x - px, center.y - px)
                                         drawRect(Color.Red, topLeft, Size(px * 2, px * 2))
@@ -296,7 +297,7 @@ fun LineGraph(plot: LinePlot) {
                                 if (isDragging.value && (dragOffset.value) > it.x - xOffset / 2 && (dragOffset.value) < it.x + xOffset / 2) {
                                     dragLocks[line] = it
                                 } else {
-                                    intersection?.draw?.invoke(this, it)
+                                    intersection?.draw?.invoke(this, it, line.dataPoints[i])
                                 }
                             }
                             curOffset = nextOffset
@@ -410,14 +411,14 @@ fun DefaultPreview() {
                         dataPoints1,
                         Connection(Color.Blue, 3.dp),
                         Intersection(Color.Blue, 6.dp),
-                        Intersection(Color.Red, 4.dp),
+                        Highlight(Color.Red, 4.dp),
                         AreaUnderLine(Color.Blue, 0.1f)
                     ),
                     Line(
                         dataPoints2,
                         Connection(Color.Gray, 2.dp),
                         Intersection(Color.Gray, 3.dp),
-                        Intersection(Color.Gray, 3.dp)
+                        Highlight(Color.Gray, 3.dp)
                     ),
                 )
             )

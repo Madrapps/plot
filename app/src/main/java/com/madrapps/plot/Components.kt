@@ -40,7 +40,7 @@ data class LinePlot(
         val dataPoints: List<DataPoint>,
         val connection: Connection?,
         val intersection: Intersection?,
-        val highlight: Intersection? = null,
+        val highlight: Highlight? = null,
         val areaUnderLine: AreaUnderLine? = null
     )
 
@@ -76,10 +76,35 @@ data class LinePlot(
         val style: DrawStyle = Fill,
         val colorFilter: ColorFilter? = null,
         val blendMode: BlendMode = DrawScope.DefaultBlendMode,
-        val draw: DrawScope.(Offset) -> Unit = { center ->
+        val draw: DrawScope.(Offset, DataPoint) -> Unit = { center, point ->
+            val x = point.x
+            val rad = if (x % 4f == 0f) radius else 3.dp
             drawCircle(
                 color,
-                radius.toPx(),
+                rad.toPx(),
+                center,
+                alpha,
+                style,
+                colorFilter,
+                blendMode
+            )
+        }
+    )
+
+    data class Highlight(
+        val color: Color = Color.Black,
+        val radius: Dp = 6.dp,
+        /*@FloatRange(from = 0.0, to = 1.0)*/
+        val alpha: Float = 1.0f,
+        val style: DrawStyle = Fill,
+        val colorFilter: ColorFilter? = null,
+        val blendMode: BlendMode = DrawScope.DefaultBlendMode,
+        val draw: DrawScope.(Offset) -> Unit = { center ->
+            val x = center.x
+            val rad = if (x % 4f == 0f) radius else 3.dp
+            drawCircle(
+                color,
+                rad.toPx(),
                 center,
                 alpha,
                 style,
@@ -128,7 +153,7 @@ data class LinePlot(
         val paddingTop: Dp = 8.dp,
         val paddingBottom: Dp = 8.dp,
         val roundToInt: Boolean = true,
-        val content: @Composable (Int, Int) -> Unit = { min, offset  ->
+        val content: @Composable (Int, Int) -> Unit = { min, offset ->
             (0 until steps).forEach {
                 val value = it * offset + min
 
