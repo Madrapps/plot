@@ -1,12 +1,8 @@
 package com.madrapps.plot
 
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 
 @Composable
@@ -44,20 +40,8 @@ fun GraphRow(
     xStart: Float,
     scrollOffset: Float,
     scale: Float,
-    color: Color = MaterialTheme.colors.onSurface,
-    values: () -> List<Value> = { listOf(Value("0", 0f)) },
     stepSize: Dp,
-    content: @Composable () -> Unit = {
-        values().forEach { (text, _) ->
-            Text(
-                text = text,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                style = MaterialTheme.typography.caption,
-                color = color
-            )
-        }
-    }
+    content: @Composable () -> Unit
 ) {
     Layout(content, modifier) { measurables, constraints ->
         val placeables = measurables.map { measurable ->
@@ -75,5 +59,3 @@ fun GraphRow(
         }
     }
 }
-
-data class Value(val text: String, val value: Float)

@@ -1,8 +1,12 @@
 package com.madrapps.plot
 
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.height
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.BlendMode
@@ -119,17 +123,41 @@ data class LinePlot(
     )
 
     data class Row(
-        val steps: Int = 10,
+        val stepSize: Dp = 20.dp,
+        val steps: Int = 24,
         val paddingTop: Dp = 8.dp,
         val paddingBottom: Dp = 8.dp,
-        val content: @Composable (String) -> Unit = {
-            Text(
-                text = it,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                style = MaterialTheme.typography.caption,
-                color = MaterialTheme.colors.onSurface
-            )
+        val roundToInt: Boolean = true,
+        val content: @Composable (Int, Int) -> Unit = { min, offset  ->
+            (0 until steps).forEach {
+                val value = it * offset + min
+
+                androidx.compose.foundation.layout.Column {
+                    val isMajor = value % 4 == 0
+                    val radius = if (isMajor) 6f else 3f
+                    val color = MaterialTheme.colors.onSurface
+                    Canvas(
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .height(20.dp),
+                        onDraw = {
+                            drawCircle(
+                                color = color,
+                                radius * density,
+                                Offset(0f, 10f * density)
+                            )
+                        })
+                    if (isMajor) {
+                        Text(
+                            text = value.toString(),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            style = MaterialTheme.typography.caption,
+                            color = color
+                        )
+                    }
+                }
+            }
         }
     )
 
@@ -137,9 +165,9 @@ data class LinePlot(
         val steps: Int = 4,
         val paddingStart: Dp = 16.dp,
         val paddingEnd: Dp = 8.dp,
-        val content: @Composable (String) -> Unit = {
+        val content: @Composable (Int) -> Unit = {
             Text(
-                text = it,
+                text = it.toString(),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 style = MaterialTheme.typography.caption,

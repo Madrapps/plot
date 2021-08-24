@@ -11,7 +11,6 @@ import androidx.compose.foundation.gestures.rememberScrollableState
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -103,6 +102,8 @@ private val dataPoints2 = listOf(
     DataPoint(21f, 0f),
     DataPoint(22f, 50f),
     DataPoint(23f, 25f),
+//    DataPoint(33f, 25f),
+//    DataPoint(43f, 25f),
 )
 
 class MainActivity : ComponentActivity() {
@@ -128,6 +129,7 @@ class MainActivity : ComponentActivity() {
                                 ),
                                 Line(
                                     dataPoints2,
+//                                    dataPoints2.map { DataPoint(it.x * 2, it.y) },
                                     Connection(Color.Gray, 2.dp),
                                     Intersection { center ->
                                         val px = 4.dp.toPx()
@@ -337,6 +339,7 @@ fun LineGraph(plot: LinePlot) {
                         }
                     }
                 })
+
             GraphColumn(
                 Modifier
                     .align(Alignment.TopStart)
@@ -360,16 +363,15 @@ fun LineGraph(plot: LinePlot) {
 
                 (0..steps).forEach {
                     val value = it * multiple + min
-                    plot.column.content(value.toString())
+                    plot.column.content(value)
                 }
             }
 
-            val values = {
-                (0..2300).map {
-                    val v = it.toFloat()
-                    Value(v.toInt().toString(), v)
-                }
-            }
+            val points = plot.lines.flatMap { it.dataPoints }
+            val min = floor(points.minOf { it.x }).toInt()
+            val max = points.maxOf { it.x }
+            val totalSteps = (max - min) + 1
+            val rowScale = ceil(totalSteps / plot.row.steps).toInt()
 
             GraphRow(
                 Modifier
@@ -388,36 +390,10 @@ fun LineGraph(plot: LinePlot) {
                     .padding(bottom = plot.row.paddingBottom, top = plot.row.paddingTop),
                 columnWidth.value + paddingLeft.value * LocalDensity.current.density,
                 offset.value,
-                xZoom.value,
-                values = values,
-                stepSize = 20.dp
+                xZoom.value * rowScale,
+                stepSize = plot.row.stepSize,
             ) {
-                values().forEach { (text, i) ->
-                    val color = MaterialTheme.colors.onSurface
-                    val density = LocalDensity.current.density
-                    // FIXME Only create composable that can be rendered on screen
-
-                    if (i >= 0f && i < 50f) {
-                        Column {
-                            val isMajor = i.toInt() % 4 == 0
-                            val radius = if (isMajor) 6f else 3f
-                            Canvas(
-                                modifier = Modifier
-                                    .align(Alignment.CenterHorizontally)
-                                    .height(20.dp),
-                                onDraw = {
-                                    drawCircle(
-                                        color = color,
-                                        radius * density,
-                                        Offset(0f, 10f * density)
-                                    )
-                                })
-                            if (isMajor) {
-                                plot.row.content.invoke(text)
-                            }
-                        }
-                    }
-                }
+                plot.row.content.invoke(min, rowScale)
             }
         }
     }
