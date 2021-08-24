@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import java.text.DecimalFormat
 
 data class DataPoint(val x: Float, val y: Float)
 
@@ -153,11 +154,11 @@ data class LinePlot(
         val paddingTop: Dp = 8.dp,
         val paddingBottom: Dp = 8.dp,
         val roundToInt: Boolean = true,
-        val content: @Composable (Int, Int, Float) -> Unit = { min, offset, max ->
+        val content: @Composable (Float, Float, Float) -> Unit = { min, offset, max ->
             for (it in 0 until steps) {
                 val value = it * offset + min
                 androidx.compose.foundation.layout.Column {
-                    val isMajor = value % 4 == 0
+                    val isMajor = value % 4 == 0f
                     val radius = if (isMajor) 6f else 3f
                     val color = MaterialTheme.colors.onSurface
                     Canvas(
@@ -173,7 +174,7 @@ data class LinePlot(
                         })
                     if (isMajor) {
                         Text(
-                            text = value.toString(),
+                            text = value.string(),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             style = MaterialTheme.typography.caption,
@@ -203,3 +204,5 @@ data class LinePlot(
         }
     )
 }
+
+private fun Float.string() = DecimalFormat("#.#").format(this)

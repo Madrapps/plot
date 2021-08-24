@@ -369,10 +369,12 @@ fun LineGraph(plot: LinePlot) {
             }
 
             val points = plot.lines.flatMap { it.dataPoints }
-            val min = floor(points.minOf { it.x }).toInt()
+            val min = points.minOf { it.x }
             val max = points.maxOf { it.x }
-            val totalSteps = (max - min) + 1
-            val rowScale = ceil(totalSteps / plot.row.steps).toInt()
+            val totalSteps =
+                (max - min) + 1 // FIXME what if min is 0.1 and max is 0.9 ? The Graph itself doesn't work, since our unit is 1.
+            val tempRowScale = (totalSteps / plot.row.steps)
+            val rowScale = if (plot.row.roundToInt) ceil(tempRowScale) else tempRowScale
 
             GraphRow(
                 Modifier
