@@ -1,4 +1,4 @@
-package com.madrapps.plot
+package com.madrapps.plot.line
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.height

@@ -6,7 +6,7 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.unit.Dp
 
 @Composable
-fun GraphColumn(
+fun GraphYAxis(
     modifier: Modifier,
     paddingTop: Float,
     paddingBottom: Float,
@@ -33,9 +33,8 @@ fun GraphColumn(
     }
 }
 
-
 @Composable
-fun GraphRow(
+fun GraphXAxis(
     modifier: Modifier,
     xStart: Float,
     scrollOffset: Float,
