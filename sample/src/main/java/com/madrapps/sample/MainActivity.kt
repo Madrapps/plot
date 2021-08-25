@@ -9,8 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
@@ -38,42 +36,34 @@ class MainActivity : ComponentActivity() {
         setContent {
             PlotTheme {
                 Column {
-                    Surface(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(300.dp),
-                        color = MaterialTheme.colors.background
-                    ) {
-                        val dataPoints1 = model.line1
-                        LineGraph(
-                            LinePlot(
-                                listOf(
-                                    Line(
-                                        dataPoints1.value,
-                                        Connection(Color.Blue, 3.dp),
-                                        Intersection(Color.Blue, 6.dp),
-                                        Highlight(Color.Red, 12.dp),
-                                        AreaUnderLine(Color.Blue, 0.1f)
-                                    ),
-                                    Line(
-                                        model.dataPoints2,
-//                                    dataPoints2.map { DataPoint(it.x * 2, it.y) },
-                                        Connection(Color.Gray, 2.dp),
-                                        Intersection { center, _ ->
-                                            val px = 4.dp.toPx()
-                                            val topLeft = Offset(center.x - px, center.y - px)
-                                            drawRect(Color.Gray, topLeft, Size(px * 2, px * 2))
-                                        },
-                                        Highlight { center ->
-                                            val px = 4.dp.toPx()
-                                            val topLeft = Offset(center.x - px, center.y - px)
-                                            drawRect(Color.Red, topLeft, Size(px * 2, px * 2))
-                                        },
-                                    ),
-                                ), Grid(Color.Gray)
-                            )
+                    LineGraph(
+                        modifier = Modifier.fillMaxWidth().height(300.dp),
+                        plot = LinePlot(
+                            listOf(
+                                Line(
+                                    model.line1.value,
+                                    Connection(Color.Blue, 3.dp),
+                                    Intersection(Color.Blue, 6.dp),
+                                    Highlight(Color.Red, 12.dp),
+                                    AreaUnderLine(Color.Blue, 0.1f)
+                                ),
+                                Line(
+                                    model.dataPoints2,
+                                    Connection(Color.Gray, 2.dp),
+                                    Intersection { center, _ ->
+                                        val px = 4.dp.toPx()
+                                        val topLeft = Offset(center.x - px, center.y - px)
+                                        drawRect(Color.Gray, topLeft, Size(px * 2, px * 2))
+                                    },
+                                    Highlight { center ->
+                                        val px = 4.dp.toPx()
+                                        val topLeft = Offset(center.x - px, center.y - px)
+                                        drawRect(Color.Red, topLeft, Size(px * 2, px * 2))
+                                    },
+                                ),
+                            ), Grid(Color.Gray)
                         )
-                    }
+                    )
                     Button(
                         onClick = { model.change() },
                         modifier = Modifier

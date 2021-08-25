@@ -16,7 +16,7 @@ class MainViewModelImpl : MainViewModel, ViewModel() {
         DataPoint(3f, 0f),
         DataPoint(4f, 0f),
         DataPoint(5f, 25f),
-        DataPoint(6f, 75f),
+        DataPoint(6f, 75f), // FIXME :Bug: Delete upto this and start from 7f. Graph draws from middle
         DataPoint(7f, 100f),
         DataPoint(8f, 80f),
         DataPoint(9f, 75f),

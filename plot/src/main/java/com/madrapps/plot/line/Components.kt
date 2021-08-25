@@ -190,17 +190,24 @@ data class LinePlot(
     )
 
     data class Column(
-        val steps: Int = 4,
+        val steps: Int = 5,
+        val roundToInt: Boolean = true,
         val paddingStart: Dp = 16.dp,
         val paddingEnd: Dp = 8.dp,
-        val content: @Composable (Int) -> Unit = {
-            Text(
-                text = it.toString(),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                style = MaterialTheme.typography.caption,
-                color = MaterialTheme.colors.onSurface
-            )
+        val content: @Composable (Float, Float, Float) -> Unit = { min, offset, max ->
+            for (it in 0 until steps) {
+                val value = it * offset + min
+                Text(
+                    text = value.string(),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.caption,
+                    color = MaterialTheme.colors.onSurface
+                )
+                if (value > max) {
+                    break
+                }
+            }
         }
     )
 }

@@ -36,11 +36,10 @@ import com.madrapps.plot.GraphYAxis
 import com.madrapps.plot.RowClip
 import com.madrapps.plot.detectDragZoomGesture
 import kotlin.math.ceil
-import kotlin.math.floor
-import kotlin.math.roundToInt
 
 @Composable
-fun LineGraph(plot: LinePlot) {
+fun LineGraph(plot: LinePlot, modifier: Modifier = Modifier) {
+
     val lines = plot.lines
 
     // Graph Line properties
@@ -70,9 +69,7 @@ fun LineGraph(plot: LinePlot) {
         LocalLayoutDirection provides LayoutDirection.Ltr,
     ) {
         Box(
-            modifier = Modifier
-                .fillMaxHeight()
-                .fillMaxWidth()
+            modifier = modifier,
         ) {
             Canvas(modifier = Modifier
                 .align(Alignment.Center)
@@ -228,40 +225,9 @@ fun LineGraph(plot: LinePlot) {
                     }
                 })
 
-            GraphYAxis(
-                Modifier
-                    .align(Alignment.TopStart)
-                    .fillMaxHeight()
-                    .wrapContentWidth()
-                    .onGloballyPositioned {
-                        columnWidth.value = it.size.width.toFloat()
-                    }
-                    .padding(start = plot.column.paddingStart, end = plot.column.paddingEnd),
-                paddingTop = paddingTop.value * LocalDensity.current.density,
-                paddingBottom = rowHeight.value,
-                scale = globalYScale,
-            ) {
-                val steps = plot.column.steps
-                val points = plot.lines.flatMap { it.dataPoints }
-                val min = floor(points.minOf { it.y }).toInt()
-                val max = points.maxOf { it.y }
-
-                val diff = (max - min)
-                val multiple = ceil(diff / steps).roundToInt()
-
-                (0..steps).forEach {
-                    val value = it * multiple + min
-                    plot.column.content(value)
-                }
-            }
-
             val points = plot.lines.flatMap { it.dataPoints }
-            val min = points.minOf { it.x }
-            val max = points.maxOf { it.x }
-            val totalSteps =
-                (max - min) + 1 // FIXME what if min is 0.1 and max is 0.9 ? The Graph itself doesn't work, since our unit is 1.
-            val tempRowScale = (totalSteps / plot.row.steps)
-            val rowScale = if (plot.row.roundToInt) ceil(tempRowScale) else tempRowScale
+            val (xMin, xMax, xAxisScale) = getXAxisScale(points, plot)
+            val (yMin, yMax, yAxisScale) = getYAxisScale(points, plot)
 
             GraphXAxis(
                 Modifier
@@ -280,11 +246,55 @@ fun LineGraph(plot: LinePlot) {
                     .padding(bottom = plot.row.paddingBottom, top = plot.row.paddingTop),
                 columnWidth.value + paddingLeft.value * LocalDensity.current.density,
                 offset.value,
-                xZoom.value * rowScale,
+                xZoom.value * xAxisScale,
                 stepSize = plot.row.stepSize,
             ) {
-                plot.row.content.invoke(min, rowScale, max)
+                plot.row.content(xMin, xAxisScale, xMax)
+            }
+
+            GraphYAxis(
+                Modifier
+                    .align(Alignment.TopStart)
+                    .fillMaxHeight()
+                    .wrapContentWidth()
+                    .onGloballyPositioned {
+                        columnWidth.value = it.size.width.toFloat()
+                    }
+                    .padding(start = plot.column.paddingStart, end = plot.column.paddingEnd),
+                paddingTop = paddingTop.value * LocalDensity.current.density,
+                paddingBottom = rowHeight.value,
+                scale = globalYScale,
+            ) {
+                plot.column.content(yMin, yAxisScale, yMax)
             }
         }
     }
+}
+
+private fun getXAxisScale(
+    points: List<DataPoint>,
+    plot: LinePlot
+): Triple<Float, Float, Float> {
+    val xMin = points.minOf { it.x }
+    val xMax = points.maxOf { it.x }
+    val totalSteps =
+        (xMax - xMin) + 1 // FIXME what if min is 0.1 and max is 0.9 ? The Graph itself doesn't work, since our unit is 1.
+    val temp = totalSteps / plot.row.steps
+    val scale = if (plot.row.roundToInt) ceil(temp) else temp
+    return Triple(xMin, xMax, scale)
+}
+
+private fun getYAxisScale(
+    points: List<DataPoint>,
+    plot: LinePlot
+): Triple<Float, Float, Float> {
+    val steps = plot.column.steps
+    val yMin = points.minOf { it.y }
+    val yMax = points.maxOf { it.y }
+
+    val totalSteps = (yMax - yMin)
+    val temp = totalSteps / if (steps > 1) (steps - 1) else 1
+
+    val scale = if (plot.column.roundToInt) ceil(temp) else temp
+    return Triple(yMin, yMax, scale)
 }
