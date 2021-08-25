@@ -13,7 +13,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -38,14 +37,14 @@ class MainActivity : ComponentActivity() {
         val model: MainViewModelImpl by viewModels()
         setContent {
             PlotTheme {
-                Column() {
+                Column {
                     Surface(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(300.dp),
                         color = MaterialTheme.colors.background
                     ) {
-                        val dataPoints1 = model.line1.observeAsState(model.dataPoints1)
+                        val dataPoints1 = model.line1
                         LineGraph(
                             LinePlot(
                                 listOf(

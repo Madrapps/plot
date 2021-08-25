@@ -1,7 +1,8 @@
 package com.madrapps.sample
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.madrapps.plot.line.DataPoint
 import kotlin.random.Random
@@ -66,7 +67,7 @@ class MainViewModelImpl : MainViewModel, ViewModel() {
 //    DataPoint(43f, 25f),
     )
 
-    override val line1: MutableLiveData<List<DataPoint>> = MutableLiveData(dataPoints1)
+    override val line1: MutableState<List<DataPoint>> = mutableStateOf(dataPoints1)
 
     override fun change() {
         val nextInt = 1 + Random.Default.nextInt(5)
@@ -77,7 +78,7 @@ class MainViewModelImpl : MainViewModel, ViewModel() {
 
 interface MainViewModel {
 
-    val line1: LiveData<List<DataPoint>>
+    val line1: State<List<DataPoint>>
 
     fun change()
 }
