@@ -41,11 +41,15 @@ internal fun LineGraph1(item: List<List<DataPoint>>) {
                         drawRect(Color.Gray, topLeft, Size(px * 2, px * 2))
                     },
                 ),
-            ), LinePlot.Grid(Color.Gray), dragSelection = LinePlot.Connection(
-                Green900,
-                strokeWidth = 2.dp,
-                pathEffect = PathEffect.dashPathEffect(floatArrayOf(40f, 20f))
-            )
+            ),
+            LinePlot.Grid(Color.Gray),
+            selection = LinePlot.Selection(
+                highlight = LinePlot.Connection(
+                    Green900,
+                    strokeWidth = 2.dp,
+                    pathEffect = PathEffect.dashPathEffect(floatArrayOf(40f, 20f))
+                )
+            ),
         )
     )
 }

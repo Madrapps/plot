@@ -1,12 +1,8 @@
 package com.madrapps.plot.line
 
-import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.layout.height
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.BlendMode
@@ -29,11 +25,7 @@ data class DataPoint(val x: Float, val y: Float)
 data class LinePlot(
     val lines: List<Line>,
     val grid: Grid? = null,
-    val dragSelection: Connection? = Connection(
-        Color.Red,
-        strokeWidth = 2.dp,
-        pathEffect = PathEffect.dashPathEffect(floatArrayOf(40f, 20f))
-    ),
+    val selection: Selection = Selection(),
     val row: Row = Row(),
     val column: Column = Column()
 ) {
@@ -109,6 +101,16 @@ data class LinePlot(
                 blendMode
             )
         }
+    )
+
+    data class Selection(
+        val enabled: Boolean = true,
+        val highlight: Connection? = Connection(
+            Color.Red,
+            strokeWidth = 2.dp,
+            pathEffect = PathEffect.dashPathEffect(floatArrayOf(40f, 20f))
+        ),
+        val detectionTime: Long = 100L,
     )
 
     data class AreaUnderLine(

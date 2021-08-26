@@ -51,8 +51,6 @@ fun LineGraph(plot: LinePlot, modifier: Modifier = Modifier) {
     val globalYScale = 1f
 
     val isZoomAllowed = true
-    val isDragAllowed = true
-    val detectDragTimeOut = 100L
 
     val offset = remember { mutableStateOf(0f) }
     val maxScrollOffset = remember { mutableStateOf(0f) }
@@ -91,8 +89,8 @@ fun LineGraph(plot: LinePlot, modifier: Modifier = Modifier) {
                 .pointerInput(Unit, Unit) {
                     detectDragZoomGesture(
                         isZoomAllowed = isZoomAllowed,
-                        isDragAllowed = isDragAllowed,
-                        detectDragTimeOut = detectDragTimeOut,
+                        isDragAllowed = plot.selection.enabled,
+                        detectDragTimeOut = plot.selection.detectionTime,
                         onDragStart = {
                             dragOffset.value = it.x
                             isDragging.value = true
@@ -205,7 +203,7 @@ fun LineGraph(plot: LinePlot, modifier: Modifier = Modifier) {
                         // Draw Drag Line highlight
                         dragLocks.values.firstOrNull()?.let { (x, _) ->
                             if (x >= columnWidth.value && x <= size.width - paddingRight.toPx()) {
-                                plot.dragSelection?.draw?.invoke(
+                                plot.selection.highlight?.draw?.invoke(
                                     this,
                                     Offset(x, yBottom),
                                     Offset(x, 0f)
@@ -294,5 +292,5 @@ private fun getYAxisScale(
 }
 
 private fun getMaxElementInYAxis(yMin: Float, offset: Float, steps: Int): Float {
-    return yMin + (if (steps > 1) steps - 1 else 1) * offset;
+    return yMin + (if (steps > 1) steps - 1 else 1) * offset
 }
