@@ -111,9 +111,10 @@ fun LineGraph(plot: LinePlot, modifier: Modifier = Modifier) {
                         getMaxElementInYAxis(yMin, yAxisScale, plot.column.steps)
                     val yOffset = ((yBottom - paddingTop.toPx()) / maxElementInYAxis) * globalYScale
 
-                    val xLastPoint = xMax * xOffset + xLeft
+                    val xLastPoint =
+                        xMax * xOffset + xLeft + paddingRight.toPx() + canvasPaddingRight.toPx()
                     maxScrollOffset.value = if (xLastPoint > size.width) {
-                        xLastPoint - size.width + paddingRight.toPx() + canvasPaddingRight.toPx()
+                        xLastPoint - size.width
                     } else 0f
 
                     val dragLocks = mutableMapOf<LinePlot.Line, Offset>()
