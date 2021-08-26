@@ -17,9 +17,8 @@ class MainActivity : ComponentActivity() {
         val model: MainViewModelImpl by viewModels()
         setContent {
             PlotTheme {
-                val cLines = model.lines.value
                 LazyColumn() {
-                    itemsIndexed(cLines) { i, item ->
+                    itemsIndexed(model.lines.value) { i, item ->
                         when (i) {
                             0 -> LineGraph1(item)
                             1 -> LineGraph2(item)

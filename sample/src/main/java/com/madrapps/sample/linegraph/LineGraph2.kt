@@ -25,8 +25,16 @@ internal fun LineGraph2(item: List<List<DataPoint>>) {
                 LinePlot.Line(
                     item[0],
                     LinePlot.Connection(Color.Blue, 3.dp),
-                    LinePlot.Intersection(Color.Blue, 6.dp),
-                    LinePlot.Highlight(Color.Red, 12.dp),
+                    LinePlot.Intersection(Color.Blue, 6.dp) { center, point ->
+                        val x = point.x
+                        val rad = if (x % 4f == 0f) 6.dp else 3.dp
+                        drawCircle(
+                            Color.Blue,
+                            rad.toPx(),
+                            center,
+                        )
+                    },
+                    LinePlot.Highlight(Color.Red, 6.dp),
                     LinePlot.AreaUnderLine(Color.Blue, 0.1f)
                 ),
                 LinePlot.Line(

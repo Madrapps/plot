@@ -78,11 +78,9 @@ data class LinePlot(
         val colorFilter: ColorFilter? = null,
         val blendMode: BlendMode = DrawScope.DefaultBlendMode,
         val draw: DrawScope.(Offset, DataPoint) -> Unit = { center, point ->
-            val x = point.x
-            val rad = if (x % 4f == 0f) radius else 3.dp
             drawCircle(
                 color,
-                rad.toPx(),
+                radius.toPx(),
                 center,
                 alpha,
                 style,
@@ -101,11 +99,9 @@ data class LinePlot(
         val colorFilter: ColorFilter? = null,
         val blendMode: BlendMode = DrawScope.DefaultBlendMode,
         val draw: DrawScope.(Offset) -> Unit = { center ->
-            val x = center.x
-            val rad = if (x % 4f == 0f) radius else 3.dp
             drawCircle(
                 color,
-                rad.toPx(),
+                radius.toPx(),
                 center,
                 alpha,
                 style,
@@ -150,38 +146,20 @@ data class LinePlot(
 
     data class Row(
         val stepSize: Dp = 20.dp,
-        val steps: Int = 24,
+        val steps: Int = 10,
         val paddingTop: Dp = 8.dp,
         val paddingBottom: Dp = 8.dp,
         val roundToInt: Boolean = true,
         val content: @Composable (Float, Float, Float) -> Unit = { min, offset, max ->
             for (it in 0 until steps) {
                 val value = it * offset + min
-                androidx.compose.foundation.layout.Column {
-                    val isMajor = value % 4 == 0f
-                    val radius = if (isMajor) 6f else 3f
-                    val color = MaterialTheme.colors.onSurface
-                    Canvas(
-                        modifier = Modifier
-                            .align(Alignment.CenterHorizontally)
-                            .height(20.dp),
-                        onDraw = {
-                            drawCircle(
-                                color = color,
-                                radius * density,
-                                Offset(0f, 10f * density)
-                            )
-                        })
-                    if (isMajor) {
-                        Text(
-                            text = value.string(),
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            style = MaterialTheme.typography.caption,
-                            color = color
-                        )
-                    }
-                }
+                Text(
+                    text = value.string(),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.caption,
+                    color = MaterialTheme.colors.onSurface
+                )
                 if (value > max) {
                     break
                 }
