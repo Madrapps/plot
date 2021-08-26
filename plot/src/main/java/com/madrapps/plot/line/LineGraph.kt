@@ -1,12 +1,10 @@
 package com.madrapps.plot.line
 
-import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.rememberScrollableState
 import androidx.compose.foundation.gestures.scrollable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -71,6 +69,10 @@ fun LineGraph(plot: LinePlot, modifier: Modifier = Modifier) {
         Box(
             modifier = modifier,
         ) {
+            val points = lines.flatMap { it.dataPoints }
+            val (xMin, xMax, xAxisScale) = getXAxisScale(points, plot)
+            val (yMin, yMax, yAxisScale) = getYAxisScale(points, plot)
+
             Canvas(modifier = Modifier
                 .align(Alignment.Center)
                 .fillMaxHeight()
@@ -84,8 +86,7 @@ fun LineGraph(plot: LinePlot, modifier: Modifier = Modifier) {
                             offset.value = maxScrollOffset.value
                         }
                         delta
-                    }, Orientation.Horizontal, enabled = true,
-                    interactionSource = MutableInteractionSource()
+                    }, Orientation.Horizontal, enabled = true
                 )
                 .pointerInput(Unit, Unit) {
                     detectDragZoomGesture(
@@ -95,7 +96,6 @@ fun LineGraph(plot: LinePlot, modifier: Modifier = Modifier) {
                         onDragStart = {
                             dragOffset.value = it.x
                             isDragging.value = true
-                            Log.d("RONNY", "DragStart = $it")
                         }, onDragEnd = {
                             isDragging.value = false
                         }, onZoom = { zoom ->
@@ -103,19 +103,17 @@ fun LineGraph(plot: LinePlot, modifier: Modifier = Modifier) {
                         }
                     ) { change, _ ->
                         dragOffset.value = change.position.x
-                        Log.d("RONNY", "DragMove = ${change.position}")
                     }
                 },
                 onDraw = {
                     val xLeft = columnWidth.value + paddingLeft.toPx()
                     val yBottom = size.height - rowHeight.value
                     val xOffset = 20.dp.toPx() * xZoom.value
-                    val allDataPoints = lines.flatMap { it.dataPoints }
-                    val yOffset =
-                        ((yBottom - paddingTop.toPx()) / allDataPoints.maxOf { it.y }) * globalYScale
+                    val maxElementInYAxis =
+                        getMaxElementInYAxis(yMin, yAxisScale, plot.column.steps)
+                    val yOffset = ((yBottom - paddingTop.toPx()) / maxElementInYAxis) * globalYScale
 
-                    val xLastPoint =
-                        allDataPoints.maxOf { it.x } * xOffset + xLeft
+                    val xLastPoint = xMax * xOffset + xLeft
                     maxScrollOffset.value = if (xLastPoint > size.width) {
                         xLastPoint - size.width + paddingRight.toPx() + canvasPaddingRight.toPx()
                     } else 0f
@@ -135,21 +133,21 @@ fun LineGraph(plot: LinePlot, modifier: Modifier = Modifier) {
 
                         // Draw area under curve
                         if (areaUnderLine != null) {
-                            val points = line.dataPoints.map { (x, y) ->
+                            val pts = line.dataPoints.map { (x, y) ->
                                 val x1 = (x * xOffset) + xLeft - offset.value
                                 val y1 = yBottom - (y * yOffset)
                                 Offset(x1, y1)
                             }
                             val p = Path()
-                            points.forEachIndexed { index, offset ->
+                            pts.forEachIndexed { index, offset ->
                                 if (index == 0) {
                                     p.moveTo(offset.x, offset.y)
                                 } else {
                                     p.lineTo(offset.x, offset.y)
                                 }
                             }
-                            val last = points.last()
-                            val first = points.first()
+                            val last = pts.last()
+                            val first = pts.first()
                             p.lineTo(last.x, first.y)
                             areaUnderLine.draw(this, p)
                         }
@@ -225,10 +223,6 @@ fun LineGraph(plot: LinePlot, modifier: Modifier = Modifier) {
                     }
                 })
 
-            val points = plot.lines.flatMap { it.dataPoints }
-            val (xMin, xMax, xAxisScale) = getXAxisScale(points, plot)
-            val (yMin, yMax, yAxisScale) = getYAxisScale(points, plot)
-
             GraphXAxis(
                 Modifier
                     .align(Alignment.BottomStart)
@@ -297,4 +291,8 @@ private fun getYAxisScale(
 
     val scale = if (plot.column.roundToInt) ceil(temp) else temp
     return Triple(yMin, yMax, scale)
+}
+
+private fun getMaxElementInYAxis(yMin: Float, offset: Float, steps: Int): Float {
+    return yMin + (if (steps > 1) steps - 1 else 1) * offset;
 }
