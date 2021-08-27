@@ -19,7 +19,7 @@ import com.madrapps.sample.ui.theme.LightGreen600
 import com.madrapps.sample.ui.theme.PlotTheme
 
 @Composable
-internal fun LineGraph7(item: List<List<DataPoint>>) {
+internal fun LineGraph8(item: List<List<DataPoint>>) {
     LineGraph(
         modifier = Modifier
             .fillMaxWidth()
@@ -51,6 +51,7 @@ internal fun LineGraph7(item: List<List<DataPoint>>) {
                     pathEffect = PathEffect.dashPathEffect(floatArrayOf(40f, 20f))
                 )
             ),
+            horizontalExtraSpace = 10.dp
         ),
         onSelection = { x, points ->
             Log.d("RONNYPOINTS", "X/Points = $x/$points")
@@ -60,7 +61,7 @@ internal fun LineGraph7(item: List<List<DataPoint>>) {
 
 @Preview(showBackground = true)
 @Composable
-fun LineGraph7Preview() {
+fun LineGraph8Preview() {
     PlotTheme {
         LineGraph1(listOf(DataPoints.dataPoints1, DataPoints.dataPoints2))
     }

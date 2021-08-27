@@ -115,7 +115,7 @@ fun LineGraph(
                     val yOffset = ((yBottom - paddingTop.toPx()) / maxElementInYAxis) * globalYScale
 
                     val xLastPoint =
-                        xMax * xOffset + xLeft + paddingRight.toPx() + horizontalGap.toPx()
+                        (xMax - xMin) * xOffset + xLeft + paddingRight.toPx() + horizontalGap.toPx()
                     maxScrollOffset.value = if (xLastPoint > size.width) {
                         xLastPoint - size.width
                     } else 0f
@@ -136,7 +136,7 @@ fun LineGraph(
                         // Draw area under curve
                         if (areaUnderLine != null) {
                             val pts = line.dataPoints.map { (x, y) ->
-                                val x1 = (x * xOffset) + xLeft - offset.value
+                                val x1 = ((x-xMin) * xOffset) + xLeft - offset.value
                                 val y1 = yBottom - (y * yOffset)
                                 Offset(x1, y1)
                             }
@@ -160,13 +160,13 @@ fun LineGraph(
                         line.dataPoints.forEachIndexed { i, _ ->
                             if (i == 0) {
                                 val (x, y) = line.dataPoints[i]
-                                val x1 = (x * xOffset) + xLeft - offset.value
+                                val x1 = ( (x-xMin) * xOffset) + xLeft - offset.value
                                 val y1 = yBottom - (y * yOffset)
                                 curOffset = Offset(x1, y1)
                             }
                             if (line.dataPoints.indices.contains(i + 1)) {
                                 val (x, y) = line.dataPoints[i + 1]
-                                val x2 = (x * xOffset) + xLeft - offset.value
+                                val x2 = ( (x - xMin) * xOffset) + xLeft - offset.value
                                 val y2 = yBottom - (y * yOffset)
                                 nextOffset = Offset(x2, y2)
                             }

@@ -21,6 +21,7 @@ import com.madrapps.sample.linegraph.LineGraph4
 import com.madrapps.sample.linegraph.LineGraph5
 import com.madrapps.sample.linegraph.LineGraph6
 import com.madrapps.sample.linegraph.LineGraph7
+import com.madrapps.sample.linegraph.LineGraph8
 import com.madrapps.sample.ui.theme.PlotTheme
 
 class MainActivity : ComponentActivity() {
@@ -43,6 +44,7 @@ class MainActivity : ComponentActivity() {
                                 LineGraph6(item, modifier = Modifier.align(Alignment.CenterHorizontally))
                             }
                             6 -> LineGraph7(item)
+                            7 -> LineGraph8(item)
                         }
                     }
                 }

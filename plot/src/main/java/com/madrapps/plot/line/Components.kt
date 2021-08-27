@@ -28,7 +28,7 @@ data class LinePlot(
     val selection: Selection = Selection(),
     val row: Row = Row(),
     val column: Column = Column(),
-    val isZoomAllowed: Boolean = false,
+    val isZoomAllowed: Boolean = true, // FIXME Change this to false
     val paddingTop: Dp = 16.dp,
     val paddingRight: Dp = 0.dp,
     val horizontalExtraSpace: Dp = 6.dp,
