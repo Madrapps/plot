@@ -7,6 +7,8 @@ import androidx.lifecycle.ViewModel
 import com.madrapps.plot.line.DataPoint
 import com.madrapps.sample.linegraph.DataPoints.Companion.dataPoints1
 import com.madrapps.sample.linegraph.DataPoints.Companion.dataPoints2
+import com.madrapps.sample.linegraph.DataPoints.Companion.dataPoints3
+import com.madrapps.sample.linegraph.DataPoints.Companion.dataPoints4
 import kotlin.random.Random
 
 class MainViewModelImpl : MainViewModel, ViewModel() {
@@ -27,7 +29,7 @@ class MainViewModelImpl : MainViewModel, ViewModel() {
             listOf(dataPoints1, dataPoints2),
             listOf(dataPoints1, dataPoints2),
             listOf(dataPoints1, dataPoints2),
-            listOf(dataPoints1, dataPoints2),
+            listOf(dataPoints3, dataPoints4),
         )
     )
 }

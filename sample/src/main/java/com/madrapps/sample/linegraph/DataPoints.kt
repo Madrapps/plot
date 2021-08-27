@@ -65,5 +65,33 @@ class DataPoints {
 //    DataPoint(33f, 25f),
 //    DataPoint(43f, 25f),
         )
+
+        val dataPoints3 = listOf(
+            DataPoint(7f, 100f),
+            DataPoint(8f, 80f),
+            DataPoint(9f, 75f),
+            DataPoint(10f, 55f),
+            DataPoint(11f, 45f), // FIXME :Bug: Change this to -45f. Graph doesn't adapt.
+            DataPoint(12f, 50f),
+            DataPoint(13f, 80f),
+            DataPoint(14f, 70f),
+            DataPoint(15f, 25f),
+            DataPoint(16f, 0f), // FIXME :Bug: Change this to 200f. Column doesn't adapt.
+            DataPoint(17f, 0f),
+        )
+
+        val dataPoints4 = listOf(
+            DataPoint(13f, 20f),
+            DataPoint(14f, 40f),
+            DataPoint(15f, 75f),
+            DataPoint(16f, 50f),
+            DataPoint(17f, 75f),
+            DataPoint(18f, 40f),
+            DataPoint(19f, 20f),
+            DataPoint(20f, 0f),
+            DataPoint(21f, 0f),
+            DataPoint(22f, 50f),
+            DataPoint(23f, 25f),
+        )
     }
 }

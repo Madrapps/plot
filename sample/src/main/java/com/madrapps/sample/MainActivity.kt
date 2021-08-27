@@ -6,18 +6,21 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.madrapps.sample.linegraph.LineGraph1
 import com.madrapps.sample.linegraph.LineGraph2
 import com.madrapps.sample.linegraph.LineGraph3
 import com.madrapps.sample.linegraph.LineGraph4
 import com.madrapps.sample.linegraph.LineGraph5
 import com.madrapps.sample.linegraph.LineGraph6
+import com.madrapps.sample.linegraph.LineGraph7
 import com.madrapps.sample.ui.theme.PlotTheme
 
 class MainActivity : ComponentActivity() {
@@ -36,9 +39,10 @@ class MainActivity : ComponentActivity() {
                             4 -> Column(Modifier.fillMaxWidth()) {
                                 LineGraph5(item, modifier = Modifier.align(Alignment.CenterHorizontally))
                             }
-                            5 -> Column(Modifier.fillMaxWidth()) {
+                            5 -> Column(Modifier.fillMaxWidth().padding(bottom = 16.dp)) {
                                 LineGraph6(item, modifier = Modifier.align(Alignment.CenterHorizontally))
                             }
+                            6 -> LineGraph7(item)
                         }
                     }
                 }
