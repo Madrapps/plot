@@ -23,6 +23,17 @@ internal fun LineGraph2(item: List<List<DataPoint>>) {
         plot = LinePlot(
             listOf(
                 LinePlot.Line(
+                    item[1],
+                    LinePlot.Connection(Color.Gray, 2.dp),
+                    null,
+                    LinePlot.Highlight { center ->
+                        val color = Color.Gray
+                        drawCircle(color, 9.dp.toPx(), center, alpha = 0.3f)
+                        drawCircle(color, 6.dp.toPx(), center)
+                        drawCircle(Color.White, 3.dp.toPx(), center)
+                    },
+                ),
+                LinePlot.Line(
                     item[0],
                     LinePlot.Connection(Color.Blue, 3.dp),
                     LinePlot.Intersection(Color.Blue, 6.dp) { center, point ->
@@ -34,18 +45,13 @@ internal fun LineGraph2(item: List<List<DataPoint>>) {
                             center,
                         )
                     },
-                    LinePlot.Highlight(Color.Red, 6.dp),
-                    LinePlot.AreaUnderLine(Color.Blue, 0.1f)
-                ),
-                LinePlot.Line(
-                    item[1],
-                    LinePlot.Connection(Color.Gray, 2.dp),
-                    null,
                     LinePlot.Highlight { center ->
-                        val px = 4.dp.toPx()
-                        val topLeft = Offset(center.x - px, center.y - px)
-                        drawRect(Color.Red, topLeft, Size(px * 2, px * 2))
+                        val color = Color.Blue
+                        drawCircle(color, 9.dp.toPx(), center, alpha = 0.3f)
+                        drawCircle(color, 6.dp.toPx(), center)
+                        drawCircle(Color.White, 3.dp.toPx(), center)
                     },
+                    LinePlot.AreaUnderLine(Color.Blue, 0.1f)
                 ),
             ), LinePlot.Grid(Color.Gray)
         )

@@ -24,6 +24,10 @@ class MainViewModelImpl : MainViewModel, ViewModel() {
             listOf(dataPoints1, dataPoints2),
             listOf(dataPoints1, dataPoints2),
             listOf(dataPoints1, dataPoints2),
+            listOf(dataPoints1, dataPoints2),
+            listOf(dataPoints1, dataPoints2),
+            listOf(dataPoints1, dataPoints2),
+            listOf(dataPoints1, dataPoints2),
         )
     )
 }

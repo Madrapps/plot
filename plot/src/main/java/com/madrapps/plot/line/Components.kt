@@ -38,7 +38,7 @@ data class LinePlot(
     )
 
     data class Connection(
-        val color: Color = Color.Black,
+        val color: Color = Color.Blue,
         val strokeWidth: Dp = 3.dp,
         val cap: StrokeCap = Stroke.DefaultCap,
         val pathEffect: PathEffect? = null,
@@ -62,7 +62,7 @@ data class LinePlot(
     )
 
     data class Intersection(
-        val color: Color = Color.Black,
+        val color: Color = Color.Blue,
         val radius: Dp = 6.dp,
         /*@FloatRange(from = 0.0, to = 1.0)*/
         val alpha: Float = 1.0f,
@@ -114,9 +114,9 @@ data class LinePlot(
     )
 
     data class AreaUnderLine(
-        val color: Color = Color.LightGray,
+        val color: Color = Color.Blue,
         /*@FloatRange(from = 0.0, to = 1.0)*/
-        val alpha: Float = 1.0f,
+        val alpha: Float = 0.1f,
         val style: DrawStyle = Fill,
         val colorFilter: ColorFilter? = null,
         val blendMode: BlendMode = DrawScope.DefaultBlendMode,

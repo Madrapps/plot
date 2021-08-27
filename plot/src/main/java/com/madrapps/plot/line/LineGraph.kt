@@ -19,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
@@ -36,7 +37,12 @@ import com.madrapps.plot.detectDragZoomGesture
 import kotlin.math.ceil
 
 @Composable
-fun LineGraph(plot: LinePlot, modifier: Modifier = Modifier) {
+fun LineGraph(
+    plot: LinePlot, modifier: Modifier = Modifier,
+    onSelection: ((Float, List<DataPoint>) -> Unit)? = null,
+    onSelectionStart: () -> Unit = {},
+    onSelectionEnd: () -> Unit = {}
+) {
 
     val lines = plot.lines
 
@@ -65,7 +71,7 @@ fun LineGraph(plot: LinePlot, modifier: Modifier = Modifier) {
         LocalLayoutDirection provides LayoutDirection.Ltr,
     ) {
         Box(
-            modifier = modifier,
+            modifier = modifier.clipToBounds(),
         ) {
             val points = lines.flatMap { it.dataPoints }
             val (xMin, xMax, xAxisScale) = getXAxisScale(points, plot)
@@ -93,9 +99,11 @@ fun LineGraph(plot: LinePlot, modifier: Modifier = Modifier) {
                         detectDragTimeOut = plot.selection.detectionTime,
                         onDragStart = {
                             dragOffset.value = it.x
+                            onSelectionStart()
                             isDragging.value = true
                         }, onDragEnd = {
                             isDragging.value = false
+                            onSelectionEnd()
                         }, onZoom = { zoom ->
                             xZoom.value *= zoom
                         }
@@ -117,7 +125,7 @@ fun LineGraph(plot: LinePlot, modifier: Modifier = Modifier) {
                         xLastPoint - size.width
                     } else 0f
 
-                    val dragLocks = mutableMapOf<LinePlot.Line, Offset>()
+                    val dragLocks = mutableMapOf<LinePlot.Line, Pair<DataPoint, Offset>>()
 
                     // Draw Grid lines
                     val region =
@@ -176,7 +184,7 @@ fun LineGraph(plot: LinePlot, modifier: Modifier = Modifier) {
                             }
                             curOffset?.let {
                                 if (isDragging.value && (dragOffset.value) > it.x - xOffset / 2 && (dragOffset.value) < it.x + xOffset / 2) {
-                                    dragLocks[line] = it
+                                    dragLocks[line] = line.dataPoints[i] to it
                                 } else {
                                     intersection?.draw?.invoke(this, it, line.dataPoints[i])
                                 }
@@ -202,7 +210,8 @@ fun LineGraph(plot: LinePlot, modifier: Modifier = Modifier) {
                     // Draw drag selection Highlight
                     if (isDragging.value) {
                         // Draw Drag Line highlight
-                        dragLocks.values.firstOrNull()?.let { (x, _) ->
+                        dragLocks.values.firstOrNull()?.let { (_, location) ->
+                            val (x, _) = location
                             if (x >= columnWidth.value && x <= size.width - paddingRight.toPx()) {
                                 plot.selection.highlight?.draw?.invoke(
                                     this,
@@ -214,10 +223,19 @@ fun LineGraph(plot: LinePlot, modifier: Modifier = Modifier) {
                         // Draw Point Highlight
                         dragLocks.entries.forEach { (line, lock) ->
                             val highlight = line.highlight
-                            val x = lock.x
+                            val location = lock.second
+                            val x = location.x
                             if (x >= columnWidth.value && x <= size.width - paddingRight.toPx()) {
-                                highlight?.draw?.invoke(this, lock)
+                                highlight?.draw?.invoke(this, location)
                             }
+                        }
+                    }
+
+                    // OnSelection
+                    if (isDragging.value) {
+                        val x = dragLocks.values.firstOrNull()?.second?.x
+                        if (x != null) {
+                            onSelection?.invoke(x, dragLocks.values.map { it.first })
                         }
                     }
                 })
