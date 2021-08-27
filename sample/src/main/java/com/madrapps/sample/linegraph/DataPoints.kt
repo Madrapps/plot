@@ -77,7 +77,7 @@ class DataPoints {
             DataPoint(14f, 70f),
             DataPoint(15f, 25f),
             DataPoint(16f, 0f), // FIXME :Bug: Change this to 200f. Column doesn't adapt.
-            DataPoint(17f, 0f),
+            DataPoint(17f, 50f),
         )
 
         val dataPoints4 = listOf(

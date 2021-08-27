@@ -136,21 +136,21 @@ fun LineGraph(
                         // Draw area under curve
                         if (areaUnderLine != null) {
                             val pts = line.dataPoints.map { (x, y) ->
-                                val x1 = ((x-xMin) * xOffset) + xLeft - offset.value
+                                val x1 = ((x - xMin) * xOffset) + xLeft - offset.value
                                 val y1 = yBottom - (y * yOffset)
                                 Offset(x1, y1)
                             }
                             val p = Path()
                             pts.forEachIndexed { index, offset ->
                                 if (index == 0) {
-                                    p.moveTo(offset.x, offset.y)
-                                } else {
-                                    p.lineTo(offset.x, offset.y)
+                                    p.moveTo(offset.x, yBottom)
                                 }
+                                p.lineTo(offset.x, offset.y)
                             }
                             val last = pts.last()
                             val first = pts.first()
-                            p.lineTo(last.x, first.y)
+                            p.lineTo(last.x, yBottom)
+                            p.lineTo(first.x, yBottom)
                             areaUnderLine.draw(this, p)
                         }
 
@@ -160,13 +160,13 @@ fun LineGraph(
                         line.dataPoints.forEachIndexed { i, _ ->
                             if (i == 0) {
                                 val (x, y) = line.dataPoints[i]
-                                val x1 = ( (x-xMin) * xOffset) + xLeft - offset.value
+                                val x1 = ((x - xMin) * xOffset) + xLeft - offset.value
                                 val y1 = yBottom - (y * yOffset)
                                 curOffset = Offset(x1, y1)
                             }
                             if (line.dataPoints.indices.contains(i + 1)) {
                                 val (x, y) = line.dataPoints[i + 1]
-                                val x2 = ( (x - xMin) * xOffset) + xLeft - offset.value
+                                val x2 = ((x - xMin) * xOffset) + xLeft - offset.value
                                 val y2 = yBottom - (y * yOffset)
                                 nextOffset = Offset(x2, y2)
                             }
