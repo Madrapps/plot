@@ -27,7 +27,11 @@ data class LinePlot(
     val grid: Grid? = null,
     val selection: Selection = Selection(),
     val row: Row = Row(),
-    val column: Column = Column()
+    val column: Column = Column(),
+    val isZoomAllowed: Boolean = false,
+    val paddingTop: Dp = 16.dp,
+    val paddingRight: Dp = 0.dp,
+    val horizontalExtraSpace: Dp = 6.dp,
 ) {
     data class Line(
         val dataPoints: List<DataPoint>,

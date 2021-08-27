@@ -43,20 +43,13 @@ fun LineGraph(
     onSelectionStart: () -> Unit = {},
     onSelectionEnd: () -> Unit = {}
 ) {
+    val paddingTop = plot.paddingTop
+    val paddingRight = plot.paddingRight
+    val horizontalGap = plot.horizontalExtraSpace
+    val isZoomAllowed = plot.isZoomAllowed
 
-    val lines = plot.lines
-
-    // Graph Line properties
-    val paddingTop = 16.dp
-    val paddingLeft = 6.dp
-    val canvasPaddingRight = 6.dp
-
-    // Overall Graph properties
-    val paddingRight = 16.dp
     val globalXScale = 1f
     val globalYScale = 1f
-
-    val isZoomAllowed = true
 
     val offset = remember { mutableStateOf(0f) }
     val maxScrollOffset = remember { mutableStateOf(0f) }
@@ -66,6 +59,8 @@ fun LineGraph(
     val rowHeight = remember { mutableStateOf(0f) }
     val columnWidth = remember { mutableStateOf(0f) }
     val bgColor = MaterialTheme.colors.surface
+
+    val lines = plot.lines
 
     CompositionLocalProvider(
         LocalLayoutDirection provides LayoutDirection.Ltr,
@@ -112,7 +107,7 @@ fun LineGraph(
                     }
                 },
                 onDraw = {
-                    val xLeft = columnWidth.value + paddingLeft.toPx()
+                    val xLeft = columnWidth.value + horizontalGap.toPx()
                     val yBottom = size.height - rowHeight.value
                     val xOffset = 20.dp.toPx() * xZoom.value
                     val maxElementInYAxis =
@@ -120,7 +115,7 @@ fun LineGraph(
                     val yOffset = ((yBottom - paddingTop.toPx()) / maxElementInYAxis) * globalYScale
 
                     val xLastPoint =
-                        xMax * xOffset + xLeft + paddingRight.toPx() + canvasPaddingRight.toPx()
+                        xMax * xOffset + xLeft + paddingRight.toPx() + horizontalGap.toPx()
                     maxScrollOffset.value = if (xLastPoint > size.width) {
                         xLastPoint - size.width
                     } else 0f
@@ -255,7 +250,7 @@ fun LineGraph(
                         rowHeight.value = it.size.height.toFloat()
                     }
                     .padding(bottom = plot.row.paddingBottom, top = plot.row.paddingTop),
-                columnWidth.value + paddingLeft.value * LocalDensity.current.density,
+                columnWidth.value + horizontalGap.value * LocalDensity.current.density,
                 offset.value,
                 xZoom.value * xAxisScale,
                 stepSize = plot.row.stepSize,
