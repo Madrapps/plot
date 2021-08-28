@@ -25,7 +25,7 @@ internal fun LineGraph9(item: List<List<DataPoint>>) {
                     LinePlot.AreaUnderLine()
                 )
             ),
-            horizontalExtraSpace = 10.dp,
+            horizontalExtraSpace = 12.dp,
             row = LinePlot.Row(unit = 0.1f),
         ),
         modifier = Modifier
