@@ -112,7 +112,7 @@ fun LineGraph(
                     val yBottom = size.height - rowHeight.value
                     val xOffset = 20.dp.toPx() * xZoom.value
                     val maxElementInYAxis =
-                        getMaxElementInYAxis(yMin, yAxisScale, plot.column.steps)
+                        getMaxElementInYAxis(yAxisScale, plot.column.steps)
                     val yOffset = ((yBottom - paddingTop.toPx()) / maxElementInYAxis) * globalYScale
 
                     val xLastPoint =
@@ -138,7 +138,7 @@ fun LineGraph(
                         if (areaUnderLine != null) {
                             val pts = line.dataPoints.map { (x, y) ->
                                 val x1 = ((x - xMin) * xOffset * (1 / xUnit)) + xLeft - offset.value
-                                val y1 = yBottom - (y * yOffset)
+                                val y1 = yBottom - ((y - yMin) * yOffset)
                                 Offset(x1, y1)
                             }
                             val p = Path()
@@ -162,13 +162,13 @@ fun LineGraph(
                             if (i == 0) {
                                 val (x, y) = line.dataPoints[i]
                                 val x1 = ((x - xMin) * xOffset * (1 / xUnit)) + xLeft - offset.value
-                                val y1 = yBottom - (y * yOffset)
+                                val y1 = yBottom - ((y - yMin) * yOffset)
                                 curOffset = Offset(x1, y1)
                             }
                             if (line.dataPoints.indices.contains(i + 1)) {
                                 val (x, y) = line.dataPoints[i + 1]
                                 val x2 = ((x - xMin) * xOffset * (1 / xUnit)) + xLeft - offset.value
-                                val y2 = yBottom - (y * yOffset)
+                                val y2 = yBottom - ((y - yMin) * yOffset)
                                 nextOffset = Offset(x2, y2)
                             }
                             if (nextOffset != null && curOffset != null) {
@@ -306,6 +306,6 @@ private fun getYAxisScale(
     return Triple(yMin, yMax, scale)
 }
 
-private fun getMaxElementInYAxis(yMin: Float, offset: Float, steps: Int): Float {
-    return yMin + (if (steps > 1) steps - 1 else 1) * offset
+private fun getMaxElementInYAxis(offset: Float, steps: Int): Float {
+    return (if (steps > 1) steps - 1 else 1) * offset
 }

@@ -15,12 +15,12 @@ class DataPoints {
             DataPoint(
                 6f,
                 75f
-            ), // FIXME :Bug: Delete upto this and start from 7f. Graph draws from middle
+            ),
             DataPoint(7f, 100f),
             DataPoint(8f, 80f),
             DataPoint(9f, 75f),
             DataPoint(10f, 55f),
-            DataPoint(11f, 45f), // FIXME :Bug: Change this to -45f. Graph doesn't adapt.
+            DataPoint(11f, 45f),
             DataPoint(12f, 50f),
             DataPoint(13f, 80f),
             DataPoint(14f, 70f),
@@ -71,7 +71,7 @@ class DataPoints {
             DataPoint(8f, 80f),
             DataPoint(9f, 75f),
             DataPoint(10f, 55f),
-            DataPoint(11f, 45f), // FIXME :Bug: Change this to -45f. Graph doesn't adapt.
+            DataPoint(11f, 45f),
             DataPoint(12f, 50f),
             DataPoint(13f, 80f),
             DataPoint(14f, 70f),
@@ -99,7 +99,7 @@ class DataPoints {
             DataPoint(-9f, 75f),
             DataPoint(-8f, 80f),
             DataPoint(-7f, 100f),
-            DataPoint(11f, 45f), // FIXME :Bug: Change this to -45f. Graph doesn't adapt.
+            DataPoint(11f, 45f),
             DataPoint(12f, 50f),
             DataPoint(13f, 80f),
             DataPoint(14f, 70f),
@@ -113,7 +113,7 @@ class DataPoints {
             DataPoint(0.4f, 75f),
             DataPoint(0.5f, 80f),
             DataPoint(0.8f, 100f),
-            DataPoint(0.9f, 45f), // FIXME :Bug: Change this to -45f. Graph doesn't adapt.
+            DataPoint(0.9f, -45f),
             DataPoint(1.2f, 50f),
             DataPoint(1.3f, 50f),
             DataPoint(1.4f, 80f),
