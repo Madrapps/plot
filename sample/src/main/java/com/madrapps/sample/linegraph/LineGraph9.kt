@@ -1,5 +1,6 @@
 package com.madrapps.sample.linegraph
 
+import android.util.Log
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
@@ -12,7 +13,7 @@ import com.madrapps.plot.line.LinePlot
 import com.madrapps.sample.ui.theme.PlotTheme
 
 @Composable
-internal fun LineGraph4(item: List<List<DataPoint>>) {
+internal fun LineGraph9(item: List<List<DataPoint>>) {
     LineGraph(
         plot = LinePlot(
             listOf(
@@ -22,23 +23,23 @@ internal fun LineGraph4(item: List<List<DataPoint>>) {
                     LinePlot.Intersection(),
                     LinePlot.Highlight(),
                     LinePlot.AreaUnderLine()
-                ),
-                LinePlot.Line(
-                    item[1],
-                    null,
-                    null
-                ),
+                )
             ),
+            horizontalExtraSpace = 10.dp,
+            row = LinePlot.Row(unit = 0.1f),
         ),
         modifier = Modifier
             .fillMaxWidth()
-            .height(200.dp)
+            .height(200.dp),
+        onSelection = { x, points ->
+            Log.d("GRAPH9", "x|points = $x|$points")
+        }
     )
 }
 
 @Preview(showBackground = true)
 @Composable
-fun LineGraph4Preview() {
+fun LineGraph9Preview() {
     PlotTheme {
         LineGraph4(listOf(DataPoints.dataPoints1, DataPoints.dataPoints2))
     }

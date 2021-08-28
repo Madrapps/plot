@@ -39,9 +39,9 @@ import kotlin.math.ceil
 @Composable
 fun LineGraph(
     plot: LinePlot, modifier: Modifier = Modifier,
-    onSelection: ((Float, List<DataPoint>) -> Unit)? = null,
     onSelectionStart: () -> Unit = {},
-    onSelectionEnd: () -> Unit = {}
+    onSelectionEnd: () -> Unit = {},
+    onSelection: ((Float, List<DataPoint>) -> Unit)? = null
 ) {
     val paddingTop = plot.paddingTop
     val paddingRight = plot.paddingRight
@@ -61,6 +61,7 @@ fun LineGraph(
     val bgColor = MaterialTheme.colors.surface
 
     val lines = plot.lines
+    val xUnit = plot.row.unit
 
     CompositionLocalProvider(
         LocalLayoutDirection provides LayoutDirection.Ltr,
@@ -115,7 +116,7 @@ fun LineGraph(
                     val yOffset = ((yBottom - paddingTop.toPx()) / maxElementInYAxis) * globalYScale
 
                     val xLastPoint =
-                        (xMax - xMin) * xOffset + xLeft + paddingRight.toPx() + horizontalGap.toPx()
+                        (xMax - xMin) * xOffset * (1 / xUnit) + xLeft + paddingRight.toPx() + horizontalGap.toPx()
                     maxScrollOffset.value = if (xLastPoint > size.width) {
                         xLastPoint - size.width
                     } else 0f
@@ -136,7 +137,7 @@ fun LineGraph(
                         // Draw area under curve
                         if (areaUnderLine != null) {
                             val pts = line.dataPoints.map { (x, y) ->
-                                val x1 = ((x - xMin) * xOffset) + xLeft - offset.value
+                                val x1 = ((x - xMin) * xOffset * (1 / xUnit)) + xLeft - offset.value
                                 val y1 = yBottom - (y * yOffset)
                                 Offset(x1, y1)
                             }
@@ -160,13 +161,13 @@ fun LineGraph(
                         line.dataPoints.forEachIndexed { i, _ ->
                             if (i == 0) {
                                 val (x, y) = line.dataPoints[i]
-                                val x1 = ((x - xMin) * xOffset) + xLeft - offset.value
+                                val x1 = ((x - xMin) * xOffset * (1 / xUnit)) + xLeft - offset.value
                                 val y1 = yBottom - (y * yOffset)
                                 curOffset = Offset(x1, y1)
                             }
                             if (line.dataPoints.indices.contains(i + 1)) {
                                 val (x, y) = line.dataPoints[i + 1]
-                                val x2 = ((x - xMin) * xOffset) + xLeft - offset.value
+                                val x2 = ((x - xMin) * xOffset * (1 / xUnit)) + xLeft - offset.value
                                 val y2 = yBottom - (y * yOffset)
                                 nextOffset = Offset(x2, y2)
                             }
@@ -252,7 +253,7 @@ fun LineGraph(
                     .padding(bottom = plot.row.paddingBottom, top = plot.row.paddingTop),
                 columnWidth.value + horizontalGap.value * LocalDensity.current.density,
                 offset.value,
-                xZoom.value * xAxisScale,
+                xZoom.value * xAxisScale * (1 / xUnit),
                 stepSize = plot.row.stepSize,
             ) {
                 plot.row.content(xMin, xAxisScale, xMax)

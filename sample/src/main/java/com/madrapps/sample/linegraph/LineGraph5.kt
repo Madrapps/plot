@@ -85,9 +85,6 @@ internal fun LineGraph5(item: List<List<DataPoint>>, modifier: Modifier) {
         }
         val padding = 0.dp
         LineGraph(
-            modifier = modifier
-                .fillMaxWidth()
-                .height(200.dp),
             plot = LinePlot(
                 listOf(
                     LinePlot.Line(
@@ -110,20 +107,22 @@ internal fun LineGraph5(item: List<List<DataPoint>>, modifier: Modifier) {
                     ),
                 ),
             ),
-            onSelection = { x, pts ->
-                val cWidth = cardWidth.value.toFloat()
-                var xCenter = x + padding.toPx(density)
-                xCenter = when {
-                    xCenter + cWidth / 2f > totalWidth.value -> totalWidth.value - cWidth
-                    xCenter - cWidth / 2f < 0f -> 0f
-                    else -> xCenter - cWidth / 2f
-                }
-                xOffset.value = xCenter
-                points.value = pts
-            },
-            onSelectionEnd = { visibility.value = false },
-            onSelectionStart = { visibility.value = true }
-        )
+            modifier = modifier
+                .fillMaxWidth()
+                .height(200.dp),
+            onSelectionStart = { visibility.value = true },
+            onSelectionEnd = { visibility.value = false }
+        ) { x, pts ->
+            val cWidth = cardWidth.value.toFloat()
+            var xCenter = x + padding.toPx(density)
+            xCenter = when {
+                xCenter + cWidth / 2f > totalWidth.value -> totalWidth.value - cWidth
+                xCenter - cWidth / 2f < 0f -> 0f
+                else -> xCenter - cWidth / 2f
+            }
+            xOffset.value = xCenter
+            points.value = pts
+        }
     }
 }
 

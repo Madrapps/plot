@@ -20,9 +20,6 @@ import com.madrapps.sample.ui.theme.PlotTheme
 @Composable
 internal fun LineGraph1(item: List<List<DataPoint>>) {
     LineGraph(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(200.dp),
         plot = LinePlot(
             listOf(
                 LinePlot.Line(
@@ -50,7 +47,10 @@ internal fun LineGraph1(item: List<List<DataPoint>>) {
                     pathEffect = PathEffect.dashPathEffect(floatArrayOf(40f, 20f))
                 )
             ),
-        )
+        ),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(200.dp)
     )
 }
 

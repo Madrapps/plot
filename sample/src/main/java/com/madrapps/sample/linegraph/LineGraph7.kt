@@ -21,9 +21,6 @@ import com.madrapps.sample.ui.theme.PlotTheme
 @Composable
 internal fun LineGraph7(item: List<List<DataPoint>>) {
     LineGraph(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(200.dp),
         plot = LinePlot(
             listOf(
                 LinePlot.Line(
@@ -52,6 +49,9 @@ internal fun LineGraph7(item: List<List<DataPoint>>) {
                 )
             ),
         ),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(200.dp),
         onSelection = { x, points ->
             Log.d("RONNYPOINTS", "X/Points = $x/$points")
         }

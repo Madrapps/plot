@@ -22,9 +22,6 @@ import java.text.DecimalFormat
 @Composable
 internal fun LineGraph3(item: List<List<DataPoint>>) {
     LineGraph(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(200.dp),
         plot = LinePlot(
             listOf(
                 LinePlot.Line(
@@ -68,7 +65,10 @@ internal fun LineGraph3(item: List<List<DataPoint>>) {
                     }
                 }
             }
-        )
+        ),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(200.dp)
     )
 }
 

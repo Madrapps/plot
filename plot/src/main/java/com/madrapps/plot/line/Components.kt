@@ -153,6 +153,7 @@ data class LinePlot(
     data class Row(
         val stepSize: Dp = 20.dp,
         val steps: Int = 10,
+        val unit: Float = 1f,
         val paddingTop: Dp = 8.dp,
         val paddingBottom: Dp = 8.dp,
         val roundToInt: Boolean = true,
