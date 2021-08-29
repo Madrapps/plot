@@ -5,12 +5,12 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.madrapps.plot.line.DataPoint
-import com.madrapps.sample.linegraph.DataPoints.Companion.dataPoints1
-import com.madrapps.sample.linegraph.DataPoints.Companion.dataPoints2
-import com.madrapps.sample.linegraph.DataPoints.Companion.dataPoints3
-import com.madrapps.sample.linegraph.DataPoints.Companion.dataPoints4
-import com.madrapps.sample.linegraph.DataPoints.Companion.dataPoints5
-import com.madrapps.sample.linegraph.DataPoints.Companion.dataPoints6
+import com.madrapps.sample.linegraph.DataPoints.dataPoints1
+import com.madrapps.sample.linegraph.DataPoints.dataPoints2
+import com.madrapps.sample.linegraph.DataPoints.dataPoints3
+import com.madrapps.sample.linegraph.DataPoints.dataPoints4
+import com.madrapps.sample.linegraph.DataPoints.dataPoints5
+import com.madrapps.sample.linegraph.DataPoints.dataPoints6
 import kotlin.random.Random
 
 class MainViewModelImpl : MainViewModel, ViewModel() {

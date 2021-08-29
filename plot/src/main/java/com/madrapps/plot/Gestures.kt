@@ -8,6 +8,7 @@ import kotlinx.coroutines.withTimeout
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.math.abs
 
+@SuppressWarnings("LoopWithTooManyJumpStatements")
 suspend fun PointerInputScope.detectDragZoomGesture(
     isZoomAllowed: Boolean = false,
     isDragAllowed: Boolean = true,

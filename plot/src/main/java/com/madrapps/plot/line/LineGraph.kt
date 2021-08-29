@@ -23,16 +23,19 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.madrapps.plot.GraphXAxis
 import com.madrapps.plot.GraphYAxis
-import com.madrapps.plot.RowClip
 import com.madrapps.plot.detectDragZoomGesture
 import kotlin.math.ceil
 
@@ -179,7 +182,12 @@ fun LineGraph(
                                 )
                             }
                             curOffset?.let {
-                                if (isDragging.value && (dragOffset.value) > it.x - xOffset / 2 && (dragOffset.value) < it.x + xOffset / 2) {
+                                if (isDragging.value && isDragLocked(
+                                        dragOffset.value,
+                                        it,
+                                        xOffset
+                                    )
+                                ) {
                                     dragLocks[line] = line.dataPoints[i] to it
                                 } else {
                                     intersection?.draw?.invoke(this, it, line.dataPoints[i])
@@ -278,6 +286,9 @@ fun LineGraph(
     }
 }
 
+private fun isDragLocked(dragOffset: Float, it: Offset, xOffset: Float) =
+    ((dragOffset) > it.x - xOffset / 2) && ((dragOffset) < it.x + xOffset / 2)
+
 private fun getXAxisScale(
     points: List<DataPoint>,
     plot: LinePlot
@@ -285,7 +296,7 @@ private fun getXAxisScale(
     val xMin = points.minOf { it.x }
     val xMax = points.maxOf { it.x }
     val totalSteps =
-        (xMax - xMin) + 1 // FIXME what if min is 0.1 and max is 0.9 ? The Graph itself doesn't work, since our unit is 1.
+        (xMax - xMin) + 1
     val temp = totalSteps / plot.row.steps
     val scale = if (plot.row.roundToInt) ceil(temp) else temp
     return Triple(xMin, xMax, scale)
@@ -308,4 +319,21 @@ private fun getYAxisScale(
 
 private fun getMaxElementInYAxis(offset: Float, steps: Int): Float {
     return (if (steps > 1) steps - 1 else 1) * offset
+}
+
+private class RowClip(private val leftPadding: Float, private val rightPadding: Dp) : Shape {
+    override fun createOutline(
+        size: Size,
+        layoutDirection: LayoutDirection,
+        density: Density
+    ): Outline {
+        return Outline.Rectangle(
+            Rect(
+                leftPadding,
+                0f,
+                size.width - rightPadding.value * density.density,
+                size.height
+            )
+        )
+    }
 }
