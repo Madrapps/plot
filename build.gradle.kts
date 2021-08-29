@@ -14,6 +14,27 @@ buildscript {
     }
 }
 
+plugins {
+    id("io.gitlab.arturbosch.detekt").version("1.10.0")
+}
+
+allprojects {
+
+    apply(plugin = "io.gitlab.arturbosch.detekt")
+
+    detekt {
+        toolVersion = "1.10.0"
+        config = files("${project.rootDir}/config/detekt.yml")
+        buildUponDefaultConfig = true
+
+        reports {
+            html.enabled = true
+            xml.enabled = false
+            txt.enabled = false
+        }
+    }
+}
+
 tasks.register("clean", Delete::class) {
     delete(rootProject.buildDir)
 }
