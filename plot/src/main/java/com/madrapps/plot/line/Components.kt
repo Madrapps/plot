@@ -73,7 +73,7 @@ data class LinePlot(
         val style: DrawStyle = Fill,
         val colorFilter: ColorFilter? = null,
         val blendMode: BlendMode = DrawScope.DefaultBlendMode,
-        val draw: DrawScope.(Offset, DataPoint) -> Unit = { center, point ->
+        val draw: DrawScope.(Offset, DataPoint) -> Unit = { center, _ ->
             drawCircle(
                 color,
                 radius.toPx(),
@@ -133,7 +133,7 @@ data class LinePlot(
         val color: Color,
         val steps: Int = 5,
         val lineWidth: Dp = 1.dp,
-        val draw: DrawScope.(Rect, Float, Float) -> Unit = { region, xOffset, yOffset ->
+        val draw: DrawScope.(Rect, Float, Float) -> Unit = { region, _, yOffset ->
             val (left, top, right, bottom) = region
             (0 until steps).forEach {
                 val y = it * 25f
@@ -179,7 +179,7 @@ data class LinePlot(
         val roundToInt: Boolean = true,
         val paddingStart: Dp = 16.dp,
         val paddingEnd: Dp = 8.dp,
-        val content: @Composable (Float, Float, Float) -> Unit = { min, offset, max ->
+        val content: @Composable (Float, Float, Float) -> Unit = { min, offset, _ ->
             for (it in 0 until steps) {
                 val value = it * offset + min
                 Text(

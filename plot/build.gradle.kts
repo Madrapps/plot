@@ -35,6 +35,10 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = rootProject.extra["compose_version"] as String
     }
+    lint {
+        isAbortOnError = true
+        isWarningsAsErrors = true
+    }
 }
 
 dependencies {
