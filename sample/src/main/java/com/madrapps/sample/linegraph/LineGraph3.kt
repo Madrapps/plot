@@ -32,7 +32,7 @@ internal fun LineGraph3(item: List<List<DataPoint>>) {
                     LinePlot.AreaUnderLine(Color.Blue, 0.1f)
                 )
             ), LinePlot.Grid(Color.Gray),
-            row = LinePlot.Row(steps = 24) { min, offset, max ->
+            xAxis = LinePlot.XAxis(steps = 24) { min, offset, max ->
                 for (it in 0 until 24) {
                     val value = it * offset + min
                     androidx.compose.foundation.layout.Column {

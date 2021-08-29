@@ -64,7 +64,7 @@ fun LineGraph(
     val bgColor = MaterialTheme.colors.surface
 
     val lines = plot.lines
-    val xUnit = plot.row.unit
+    val xUnit = plot.xAxis.unit
 
     CompositionLocalProvider(
         LocalLayoutDirection provides LayoutDirection.Ltr,
@@ -258,13 +258,13 @@ fun LineGraph(
                     .onGloballyPositioned {
                         rowHeight.value = it.size.height.toFloat()
                     }
-                    .padding(bottom = plot.row.paddingBottom, top = plot.row.paddingTop),
+                    .padding(bottom = plot.xAxis.paddingBottom, top = plot.xAxis.paddingTop),
                 columnWidth.value + horizontalGap.value * LocalDensity.current.density,
                 offset.value,
                 xZoom.value * xAxisScale * (1 / xUnit),
-                stepSize = plot.row.stepSize,
+                stepSize = plot.xAxis.stepSize,
             ) {
-                plot.row.content(xMin, xAxisScale, xMax)
+                plot.xAxis.content(xMin, xAxisScale, xMax)
             }
 
             GraphYAxis(
@@ -297,8 +297,8 @@ private fun getXAxisScale(
     val xMax = points.maxOf { it.x }
     val totalSteps =
         (xMax - xMin) + 1
-    val temp = totalSteps / plot.row.steps
-    val scale = if (plot.row.roundToInt) ceil(temp) else temp
+    val temp = totalSteps / plot.xAxis.steps
+    val scale = if (plot.xAxis.roundToInt) ceil(temp) else temp
     return Triple(xMin, xMax, scale)
 }
 
