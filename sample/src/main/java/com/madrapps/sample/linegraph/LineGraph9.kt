@@ -26,7 +26,8 @@ internal fun LineGraph9(item: List<List<DataPoint>>) {
                 )
             ),
             horizontalExtraSpace = 12.dp,
-            row = LinePlot.Row(unit = 0.1f),
+            row = LinePlot.Row(unit = 0.1f, roundToInt = false),
+            column = LinePlot.Column(steps = 4, roundToInt = false)
         ),
         modifier = Modifier
             .fillMaxWidth()

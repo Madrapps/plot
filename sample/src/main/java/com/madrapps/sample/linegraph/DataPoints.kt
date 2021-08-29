@@ -109,22 +109,22 @@ class DataPoints {
         )
 
         val dataPoints6 = listOf(
-            DataPoint(-0.3f, -25f),
-            DataPoint(-0.2f, 0f),
-            DataPoint(-0.1f, 55f),
-            DataPoint(-0f, 60f),
-            DataPoint(0.1f, 30f),
-            DataPoint(0.3f, -25f),
-            DataPoint(0.4f, 75f),
-            DataPoint(0.5f, 80f),
-            DataPoint(0.8f, 100f),
-            DataPoint(0.9f, -45f),
-            DataPoint(1.2f, 50f),
-            DataPoint(1.3f, 50f),
-            DataPoint(1.4f, -80f),
-            DataPoint(1.5f, 70f),
-            DataPoint(1.6f, 25f),
-            DataPoint(1.7f, -0f),
+            DataPoint(-0.3f, -1f),
+            DataPoint(-0.2f, 2f),
+            DataPoint(-0.1f, 0.5f),
+            DataPoint(-0f, 0.0f),
+            DataPoint(0.1f, 0.3f),
+            DataPoint(0.3f, 0.25f),
+            DataPoint(0.4f, 0.75f),
+            DataPoint(0.5f, 0.80f),
+            DataPoint(0.8f, 1f),
+            DataPoint(0.9f, 1.45f),
+            DataPoint(1.2f, 0.50f),
+            DataPoint(1.3f, 1.50f),
+            DataPoint(1.4f, 0.80f),
+            DataPoint(1.5f, 1.70f),
+            DataPoint(1.6f, 2f),
+            DataPoint(1.7f, 0f),
         )
     }
 }

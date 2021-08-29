@@ -189,9 +189,6 @@ data class LinePlot(
                     style = MaterialTheme.typography.caption,
                     color = MaterialTheme.colors.onSurface
                 )
-                if (value > max) {
-                    break
-                }
             }
         }
     )
