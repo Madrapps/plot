@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.madrapps.plot.line.DataPoint
@@ -27,7 +28,8 @@ internal fun LineGraph9(item: List<List<DataPoint>>) {
             ),
             horizontalExtraSpace = 12.dp,
             xAxis = LinePlot.XAxis(unit = 0.1f, roundToInt = false),
-            column = LinePlot.YAxis(steps = 4, roundToInt = false)
+            column = LinePlot.YAxis(steps = 4, roundToInt = false),
+            grid = LinePlot.Grid(Color.Gray, steps = 4),
         ),
         modifier = Modifier
             .fillMaxWidth()
@@ -42,6 +44,6 @@ internal fun LineGraph9(item: List<List<DataPoint>>) {
 @Composable
 fun LineGraph9Preview() {
     PlotTheme {
-        LineGraph4(listOf(DataPoints.dataPoints1, DataPoints.dataPoints2))
+        LineGraph9(listOf(DataPoints.dataPoints1, DataPoints.dataPoints2))
     }
 }

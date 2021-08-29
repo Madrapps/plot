@@ -63,6 +63,6 @@ internal fun LineGraph8(item: List<List<DataPoint>>) {
 @Composable
 fun LineGraph8Preview() {
     PlotTheme {
-        LineGraph1(listOf(DataPoints.dataPoints1, DataPoints.dataPoints2))
+        LineGraph8(listOf(DataPoints.dataPoints1, DataPoints.dataPoints2))
     }
 }

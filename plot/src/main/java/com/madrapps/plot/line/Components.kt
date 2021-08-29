@@ -56,7 +56,7 @@ data class LinePlot(
     val selection: Selection = Selection(),
     val xAxis: XAxis = XAxis(),
     val column: YAxis = YAxis(),
-    val isZoomAllowed: Boolean = true, // FIXME Change this to false
+    val isZoomAllowed: Boolean = true,
     val paddingTop: Dp = 16.dp,
     val paddingRight: Dp = 0.dp,
     val horizontalExtraSpace: Dp = 6.dp,
@@ -242,19 +242,18 @@ data class LinePlot(
         val color: Color,
         val steps: Int = 5,
         val lineWidth: Dp = 1.dp,
-        val draw: DrawScope.(Rect, Float, Float) -> Unit = { region, _, yOffset ->
+        val draw: DrawScope.(Rect, Float, Float) -> Unit = { region, _, _ ->
             val (left, top, right, bottom) = region
+            val availableHeight = bottom - top
+            val offset = availableHeight / if (steps > 1) steps - 1 else 1
             (0 until steps).forEach {
-                val y = it * 25f
-                val y1 = bottom - (y * yOffset)
-                if (y1 >= top) {
-                    drawLine(
-                        color,
-                        Offset(left, y1),
-                        Offset(right, y1),
-                        lineWidth.toPx()
-                    )
-                }
+                val y = bottom - (it * offset)
+                drawLine(
+                    color,
+                    Offset(left, y),
+                    Offset(right, y),
+                    lineWidth.toPx()
+                )
             }
         }
     )

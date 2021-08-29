@@ -62,6 +62,6 @@ internal fun LineGraph7(item: List<List<DataPoint>>) {
 @Composable
 fun LineGraph7Preview() {
     PlotTheme {
-        LineGraph1(listOf(DataPoints.dataPoints1, DataPoints.dataPoints2))
+        LineGraph7(listOf(DataPoints.dataPoints1, DataPoints.dataPoints2))
     }
 }

@@ -127,9 +127,10 @@ fun LineGraph(
                     val dragLocks = mutableMapOf<LinePlot.Line, Pair<DataPoint, Offset>>()
 
                     // Draw Grid lines
+                    val top = yBottom - ((yMax - yMin) * yOffset)
                     val region =
-                        Rect(xLeft, paddingTop.toPx(), size.width - paddingRight.toPx(), yBottom)
-                    plot.grid?.draw?.invoke(this, region, xOffset, yOffset)
+                        Rect(xLeft, top, size.width - paddingRight.toPx(), yBottom)
+                    plot.grid?.draw?.invoke(this, region, xOffset * (1 / xUnit), yOffset)
 
                     // Draw Lines and Points and AreaUnderLine
                     lines.forEach { line ->
