@@ -2,8 +2,7 @@
 An android compose library with different Graphs and Charts (*currently supports only Line graph, more types will
 be added soon*)
 
-https://user-images.githubusercontent.com/11502338/131329561-be841b3f-a2b1-4d78-b981-3a0487b73af4.mp4
-
+<img src="/preview/line_graph_recording.gif" alt="Line Graph 1" width="600"/>
 
 <img src="/preview/line_graph_1.png" alt="Line Graph 1" title="Line Graph 1" width="400"/>&nbsp;&nbsp;<img src="/preview/line_graph_2.png" alt="Line Graph 2" title="Line Graph 2" width="400"/>&nbsp;&nbsp;<img src="/preview/line_graph_3.png" alt="Line Graph 3" title="Line Graph 3" width="400" />&nbsp;&nbsp;<img src="/preview/line_graph_4.png" alt="Line Graph 4" title="Line Graph 4" width="400" />
 
