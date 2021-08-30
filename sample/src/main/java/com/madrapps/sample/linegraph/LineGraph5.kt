@@ -29,7 +29,7 @@ internal fun LineGraph5(lines: List<List<DataPoint>>) {
             ),
             horizontalExtraSpace = 12.dp,
             xAxis = LinePlot.XAxis(unit = 0.1f, roundToInt = false),
-            column = LinePlot.YAxis(steps = 4, roundToInt = false),
+            yAxis = LinePlot.YAxis(steps = 4, roundToInt = false),
             grid = LinePlot.Grid(Red100, steps = 4),
         ),
         modifier = Modifier
