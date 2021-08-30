@@ -1,0 +1,27 @@
+name: Check
+
+on:
+  pull_request:
+    types: [opened, ready_for_review, synchronize]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          path: cxbu-android
+
+      - name: Setup JDK 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+
+      - name: Detekt
+        run: ./gradlew detekt --stacktrace
+
+      - name: Check
+        run: ./gradlew check --stacktrace
