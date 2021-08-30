@@ -17,7 +17,6 @@ dependencies {
 
 Features
 -----
-- Includes `LineGraph`
 - Full customization of the various parts of the graph (like the point, line between the points, highlight 
   when selected, the values in x-axis and y-axis, etc...)
 - Supports scrolling, zooming and touch drag selection
