@@ -2,10 +2,9 @@
 An android compose library with different Graphs and Charts (*currently supports only Line graph, more types will
 be added soon*)
 
-<img src="/preview/line_graph_1.png" alt="Line Graph 1" title="Line Graph 1" width="400"/>
-<img src="/preview/line_graph_2.png" alt="Line Graph 2" title="Line Graph 2" width="400"/>
-<img src="/preview/line_graph_3.png" alt="Line Graph 3" title="Line Graph 3" width="400" />
-<img src="/preview/line_graph_4.png" alt="Line Graph 4" title="Line Graph 4" width="400" />
+
+
+<img src="/preview/line_graph_1.png" alt="Line Graph 1" title="Line Graph 1" width="400"/>&nbsp;&nbsp;<img src="/preview/line_graph_2.png" alt="Line Graph 2" title="Line Graph 2" width="400"/>&nbsp;&nbsp;<img src="/preview/line_graph_3.png" alt="Line Graph 3" title="Line Graph 3" width="400" />&nbsp;&nbsp;<img src="/preview/line_graph_4.png" alt="Line Graph 4" title="Line Graph 4" width="400" />
 
 Download
 -----

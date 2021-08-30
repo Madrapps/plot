@@ -17,10 +17,6 @@ import com.madrapps.sample.linegraph.LineGraph2
 import com.madrapps.sample.linegraph.LineGraph3
 import com.madrapps.sample.linegraph.LineGraph4
 import com.madrapps.sample.linegraph.LineGraph5
-import com.madrapps.sample.linegraph.LineGraph6
-import com.madrapps.sample.linegraph.LineGraph7
-import com.madrapps.sample.linegraph.LineGraph8
-import com.madrapps.sample.linegraph.LineGraph9
 import com.madrapps.sample.ui.theme.PlotTheme
 
 class MainActivity : ComponentActivity() {
@@ -35,25 +31,17 @@ class MainActivity : ComponentActivity() {
                             0 -> LineGraph2(item)
                             1 -> LineGraph1(item)
                             2 -> LineGraph3(item)
-                            3 -> LineGraph4(item)
-                            4 -> Column(Modifier.fillMaxWidth()) {
-                                LineGraph5(
-                                    item,
-                                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                                )
-                            }
                             5 -> Column(
                                 Modifier
                                     .fillMaxWidth()
-                                    .padding(bottom = 16.dp)) {
-                                LineGraph6(
+                                    .padding(bottom = 16.dp)
+                            ) {
+                                LineGraph4(
                                     item,
                                     modifier = Modifier.align(Alignment.CenterHorizontally)
                                 )
                             }
-                            6 -> LineGraph7(item)
-                            7 -> LineGraph8(item)
-                            8 -> LineGraph9(item)
+                            8 -> LineGraph5(item)
                         }
                     }
                 }
