@@ -48,7 +48,7 @@ internal fun LineGraph2(item: List<List<DataPoint>>) {
                     },
                     LinePlot.AreaUnderLine(Color.Blue, 0.1f)
                 ),
-            ), LinePlot.Grid(Color.Gray)
+            ), LinePlot.Grid(Color.Gray), paddingRight = 16.dp
         ),
         modifier = Modifier
             .fillMaxWidth()

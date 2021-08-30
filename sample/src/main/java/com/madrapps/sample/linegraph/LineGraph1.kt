@@ -39,7 +39,6 @@ internal fun LineGraph1(item: List<List<DataPoint>>) {
                     },
                 ),
             ),
-            LinePlot.Grid(Color.Gray),
             selection = LinePlot.Selection(
                 highlight = LinePlot.Connection(
                     Green900,

@@ -26,12 +26,12 @@ internal fun LineGraph3(item: List<List<DataPoint>>) {
             listOf(
                 LinePlot.Line(
                     item[0],
-                    LinePlot.Connection(Color.Blue, 3.dp),
-                    LinePlot.Intersection(Color.Blue, 6.dp),
+                    LinePlot.Connection(Color.Blue, 2.dp),
+                    LinePlot.Intersection(Color.Blue, 4.dp),
                     LinePlot.Highlight(Color.Red, 6.dp),
                     LinePlot.AreaUnderLine(Color.Blue, 0.1f)
                 )
-            ), LinePlot.Grid(Color.Gray),
+            ), LinePlot.Grid(Color.LightGray.copy(0.5f)),
             xAxis = LinePlot.XAxis(steps = 24) { min, offset, max ->
                 for (it in 0 until 24) {
                     val value = it * offset + min
@@ -64,7 +64,7 @@ internal fun LineGraph3(item: List<List<DataPoint>>) {
                         break
                     }
                 }
-            }
+            }, paddingRight = 8.dp
         ),
         modifier = Modifier
             .fillMaxWidth()

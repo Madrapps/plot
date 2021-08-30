@@ -12,6 +12,10 @@ import com.madrapps.plot.line.DataPoint
 import com.madrapps.plot.line.LineGraph
 import com.madrapps.plot.line.LinePlot
 import com.madrapps.sample.ui.theme.PlotTheme
+import com.madrapps.sample.ui.theme.Red100
+import com.madrapps.sample.ui.theme.Red300
+import com.madrapps.sample.ui.theme.Red500
+import com.madrapps.sample.ui.theme.Yellow700
 
 @Composable
 internal fun LineGraph9(item: List<List<DataPoint>>) {
@@ -20,16 +24,15 @@ internal fun LineGraph9(item: List<List<DataPoint>>) {
             listOf(
                 LinePlot.Line(
                     item[0],
-                    LinePlot.Connection(),
-                    LinePlot.Intersection(),
-                    LinePlot.Highlight(),
-                    LinePlot.AreaUnderLine()
+                    LinePlot.Connection(color = Red300),
+                    LinePlot.Intersection(color = Red500),
+                    LinePlot.Highlight(color = Yellow700),
                 )
             ),
             horizontalExtraSpace = 12.dp,
             xAxis = LinePlot.XAxis(unit = 0.1f, roundToInt = false),
             column = LinePlot.YAxis(steps = 4, roundToInt = false),
-            grid = LinePlot.Grid(Color.Gray, steps = 4),
+            grid = LinePlot.Grid(Red100, steps = 4),
         ),
         modifier = Modifier
             .fillMaxWidth()

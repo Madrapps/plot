@@ -32,9 +32,9 @@ class MainActivity : ComponentActivity() {
                 LazyColumn(Modifier.fillMaxWidth()) {
                     itemsIndexed(model.lines.value) { i, item ->
                         when (i) {
-                            0 -> LineGraph3(item)
-                            1 -> LineGraph2(item)
-                            2 -> LineGraph1(item)
+                            0 -> LineGraph2(item)
+                            1 -> LineGraph1(item)
+                            2 -> LineGraph3(item)
                             3 -> LineGraph4(item)
                             4 -> Column(Modifier.fillMaxWidth()) {
                                 LineGraph5(
