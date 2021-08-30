@@ -39,6 +39,19 @@ import com.madrapps.plot.GraphYAxis
 import com.madrapps.plot.detectDragZoomGesture
 import kotlin.math.ceil
 
+/**
+ * A composable that draws a Line graph with the configurations provided by the [LinePlot]. The graph
+ * can be scrolled, zoomed and touch dragged for selection. Every part of the line graph can be customized,
+ * by changing the configuration in the [LinePlot].
+ *
+ * @param plot the configuration to render the full graph
+ * @param modifier Modifier
+ * @param onSelectionStart invoked when the selection has started
+ * @param onSelectionEnd invoked when the selection has ended
+ * @param onSelection invoked when selection changes from one point to the next. You are provided
+ * with the xOffset where the selection occurred in the graph and the [DataPoint]s that are selected. If there
+ * are multiple lines, you will get multiple data points.
+ */
 @Composable
 fun LineGraph(
     plot: LinePlot, modifier: Modifier = Modifier,

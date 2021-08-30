@@ -5,8 +5,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.unit.Dp
 
+/**
+ * Composable that Layouts the child composables in the Y Axis. This does the same thing as a Column
+ * composable, but with customisation that takes care of the scale.
+ *
+ * @param modifier Modifier
+ * @param paddingTop the top padding
+ * @param paddingBottom the bottom padding
+ * @param scale the scale in y axis
+ * @param content the composable that draws the item in the Y axis
+ */
 @Composable
-fun GraphYAxis(
+internal fun GraphYAxis(
     modifier: Modifier,
     paddingTop: Float,
     paddingBottom: Float,
@@ -33,8 +43,19 @@ fun GraphYAxis(
     }
 }
 
+/**
+ * Composable that Layouts the child composables in the X Axis. This does the same thing as a Row
+ * composable, but with customisation that takes care of the scale.
+ *
+ * @param modifier Modifier
+ * @param xStart the left position where the first child is laid out
+ * @param scrollOffset the offset value that varies based on the scroll
+ * @param scale the scale in x axis
+ * @param stepSize the distance between two adjacent data points
+ * @param content the composable that draws the item in the X axis
+ */
 @Composable
-fun GraphXAxis(
+internal fun GraphXAxis(
     modifier: Modifier,
     xStart: Float,
     scrollOffset: Float,
