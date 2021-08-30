@@ -50,7 +50,8 @@ android {
 }
 
 dependencies {
-    implementation(project(mapOf("path" to ":plot")))
+//    implementation(project(mapOf("path" to ":plot")))
+    implementation("com.github.madrapps:plot:0.1.0")
 
     implementation("androidx.core:core-ktx:1.6.0")
     implementation("androidx.appcompat:appcompat:1.3.1")

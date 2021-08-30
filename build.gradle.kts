@@ -16,10 +16,10 @@ buildscript {
 
 plugins {
     id("io.gitlab.arturbosch.detekt").version("1.10.0")
+    id("io.github.gradle-nexus.publish-plugin").version("1.1.0")
 }
 
 allprojects {
-
     apply(plugin = "io.gitlab.arturbosch.detekt")
 
     detekt {
@@ -37,4 +37,15 @@ allprojects {
 
 tasks.register("clean", Delete::class) {
     delete(rootProject.buildDir)
+}
+
+// Publish to Maven Central
+nexusPublishing {
+    repositories {
+        sonatype {
+            username.set(System.getenv("OSS_USERNAME"))
+            password.set(System.getenv("OSS_PASSWORD"))
+            stagingProfileId.set(System.getenv("OSS_STAGING_PROFILE_ID"))
+        }
+    }
 }

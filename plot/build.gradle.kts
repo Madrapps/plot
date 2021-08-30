@@ -3,13 +3,25 @@ plugins {
     id("kotlin-android")
 }
 
+val groupId = "com.github.madrapps"
+val artifactId = "plot"
+val libVersion = "0.1.0"
+
+ext {
+    set("GROUP_ID", groupId)
+    set("ARTIFACT_ID", artifactId)
+    set("VERSION", libVersion)
+}
+
+apply(from = "publish.gradle")
+
 android {
     compileSdk = 30
 
     defaultConfig {
         minSdk = 21
         targetSdk = 30
-        version = "0.1.0"
+        version = libVersion
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
