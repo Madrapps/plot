@@ -1,6 +1,6 @@
 # plot
-A compose library with different Graphs and Charts (**currently supports only Line graph, more types will
-be added soon**)
+An android compose library with different Graphs and Charts (*currently supports only Line graph, more types will
+be added soon*)
 
 Download
 -----
@@ -20,6 +20,7 @@ Features
 - Includes `LineGraph`
 - Full customization of the various parts of the graph (like the point, line between the points, highlight 
   when selected, the values in x-axis and y-axis, etc...)
+- Supports scrolling, zooming and touch drag selection
 
 Usage
 -----
@@ -34,4 +35,4 @@ customisations available.
 License
 -----
 
-*plot* by [Madrapps](http://madrapps.github.io/) is licensed under a [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0).
+**plot** by [Madrapps](http://madrapps.github.io/) is licensed under the [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0).
