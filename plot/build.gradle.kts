@@ -5,7 +5,7 @@ plugins {
 
 val groupId = "com.github.madrapps"
 val artifactId = "plot"
-val libVersion = "0.1.0"
+val libVersion = "0.1.1"
 
 ext {
     set("GROUP_ID", groupId)
