@@ -29,9 +29,7 @@ class MainActivity : ComponentActivity() {
                     itemsIndexed(model.lines.value) { i, item ->
                         when (i) {
                             0 -> LineGraph2(item)
-                            1 -> LineGraph1(item)
-                            2 -> LineGraph3(item)
-                            5 -> Column(
+                            1 -> Column(
                                 Modifier
                                     .fillMaxWidth()
                                     .padding(bottom = 16.dp)
@@ -41,7 +39,9 @@ class MainActivity : ComponentActivity() {
                                     modifier = Modifier.align(Alignment.CenterHorizontally)
                                 )
                             }
-                            8 -> LineGraph5(item)
+                            2 -> LineGraph1(item)
+                            3 -> LineGraph3(item)
+                            4 -> LineGraph5(item)
                         }
                     }
                 }

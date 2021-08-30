@@ -9,7 +9,6 @@ import com.madrapps.sample.linegraph.DataPoints.dataPoints1
 import com.madrapps.sample.linegraph.DataPoints.dataPoints2
 import com.madrapps.sample.linegraph.DataPoints.dataPoints3
 import com.madrapps.sample.linegraph.DataPoints.dataPoints4
-import com.madrapps.sample.linegraph.DataPoints.dataPoints5
 import com.madrapps.sample.linegraph.DataPoints.dataPoints6
 import kotlin.random.Random
 
@@ -26,13 +25,9 @@ class MainViewModelImpl : MainViewModel, ViewModel() {
     override val lines: State<List<List<List<DataPoint>>>> = mutableStateOf(
         listOf(
             listOf(dataPoints1, dataPoints2),
+            listOf(dataPoints3, dataPoints2),
             listOf(dataPoints1, dataPoints2),
             listOf(dataPoints1, dataPoints2),
-            listOf(dataPoints1, dataPoints2),
-            listOf(dataPoints1, dataPoints2),
-            listOf(dataPoints1, dataPoints2),
-            listOf(dataPoints3, dataPoints4),
-            listOf(dataPoints5, dataPoints4),
             listOf(dataPoints6, dataPoints4),
         )
     )
