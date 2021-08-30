@@ -30,10 +30,31 @@ Usage
 -----
 Just add the `LineGraph` composable and pass it a `LinePlot` with all your configuration and customisation.
 Please take a look at the [sample](https://github.com/Madrapps/plot/tree/main/sample) app to see the various
-customisations available.
+customisations available. Almost every aspect of the graph is customisable. You can even override the default
+draw implementations and you can draw a `Rectangle` instead of a `Circle`.<br>
+The below code renders the Orange graph that you see in the above screenshots.
 
 ```kotlin
-  val sample = "sample"
+@Composable
+fun SampleLineGraph(lines: List<List<DataPoint>>) {
+    LineGraph(
+        plot = LinePlot(
+            listOf(
+                LinePlot.Line(
+                    lines[0],
+                    LinePlot.Connection(color = Red300),
+                    LinePlot.Intersection(color = Red500),
+                    LinePlot.Highlight(color = Yellow700),
+                )
+            ),
+            grid = LinePlot.Grid(Red100, steps = 4),
+        ),
+        modifier = Modifier.fillMaxWidth().height(200.dp),
+        onSelection = { x, points ->
+            // Do whatever you want here
+        }
+    )
+}
 ```
 
 License

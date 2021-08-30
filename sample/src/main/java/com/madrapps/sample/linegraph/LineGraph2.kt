@@ -13,12 +13,12 @@ import com.madrapps.plot.line.LinePlot
 import com.madrapps.sample.ui.theme.PlotTheme
 
 @Composable
-internal fun LineGraph2(item: List<List<DataPoint>>) {
+internal fun LineGraph2(lines: List<List<DataPoint>>) {
     LineGraph(
         plot = LinePlot(
             listOf(
                 LinePlot.Line(
-                    item[1],
+                    lines[1],
                     LinePlot.Connection(Color.Gray, 2.dp),
                     null,
                     LinePlot.Highlight { center ->
@@ -29,7 +29,7 @@ internal fun LineGraph2(item: List<List<DataPoint>>) {
                     },
                 ),
                 LinePlot.Line(
-                    item[0],
+                    lines[0],
                     LinePlot.Connection(Color.Blue, 3.dp),
                     LinePlot.Intersection(Color.Blue, 6.dp) { center, point ->
                         val x = point.x

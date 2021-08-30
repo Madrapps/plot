@@ -35,7 +35,7 @@ import com.madrapps.sample.ui.theme.PlotTheme
 import java.text.DecimalFormat
 
 @Composable
-internal fun LineGraph4(item: List<List<DataPoint>>, modifier: Modifier) {
+internal fun LineGraph4(lines: List<List<DataPoint>>, modifier: Modifier) {
     val totalWidth = remember { mutableStateOf(0) }
     Column(Modifier.onGloballyPositioned {
         totalWidth.value = it.size.width
@@ -86,7 +86,7 @@ internal fun LineGraph4(item: List<List<DataPoint>>, modifier: Modifier) {
                 plot = LinePlot(
                     listOf(
                         LinePlot.Line(
-                            item[1],
+                            lines[1],
                             LinePlot.Connection(Color.Gray, 2.dp),
                             null,
                             LinePlot.Highlight { center ->
@@ -97,7 +97,7 @@ internal fun LineGraph4(item: List<List<DataPoint>>, modifier: Modifier) {
                             },
                         ),
                         LinePlot.Line(
-                            item[0],
+                            lines[0],
                             LinePlot.Connection(),
                             LinePlot.Intersection(),
                             LinePlot.Highlight { center ->
@@ -167,7 +167,7 @@ private fun ScoreRow(title: String, value: Float, color: Color) {
 
 @Preview(showBackground = true)
 @Composable
-fun LineGraph6Preview() {
+fun LineGraph4Preview() {
     PlotTheme {
         LineGraph4(listOf(DataPoints.dataPoints1, DataPoints.dataPoints2), Modifier)
     }

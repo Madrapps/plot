@@ -41,7 +41,7 @@ data class DataPoint(val x: Float, val y: Float)
  * @param grid rendering logic on how the [Grid] should be drawn. If null, no grid is drawn.
  * @param selection controls the touch and drag selection behaviour using [Selection]
  * @param xAxis controls the behaviour, scale and drawing logic of the X Axis
- * @param column controls the behaviour, scale and drawing logic of the Y Axis
+ * @param yAxis controls the behaviour, scale and drawing logic of the Y Axis
  * @param isZoomAllowed if true, the graph will zoom on pinch zoom. If false, no zoom action.
  * @param paddingTop adjusts the top padding of the graph. If you want to adjust the bottom padding, adjust
  * the [XAxis.paddingBottom]
@@ -55,7 +55,7 @@ data class LinePlot(
     val grid: Grid? = null,
     val selection: Selection = Selection(),
     val xAxis: XAxis = XAxis(),
-    val column: YAxis = YAxis(),
+    val yAxis: YAxis = YAxis(),
     val isZoomAllowed: Boolean = true,
     val paddingTop: Dp = 16.dp,
     val paddingRight: Dp = 0.dp,

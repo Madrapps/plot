@@ -128,7 +128,7 @@ fun LineGraph(
                     val yBottom = size.height - rowHeight.value
                     val xOffset = 20.dp.toPx() * xZoom.value
                     val maxElementInYAxis =
-                        getMaxElementInYAxis(yAxisScale, plot.column.steps)
+                        getMaxElementInYAxis(yAxisScale, plot.yAxis.steps)
                     val yOffset = ((yBottom - paddingTop.toPx()) / maxElementInYAxis) * globalYScale
 
                     val xLastPoint =
@@ -289,12 +289,12 @@ fun LineGraph(
                     .onGloballyPositioned {
                         columnWidth.value = it.size.width.toFloat()
                     }
-                    .padding(start = plot.column.paddingStart, end = plot.column.paddingEnd),
+                    .padding(start = plot.yAxis.paddingStart, end = plot.yAxis.paddingEnd),
                 paddingTop = paddingTop.value * LocalDensity.current.density,
                 paddingBottom = rowHeight.value,
                 scale = globalYScale,
             ) {
-                plot.column.content(yMin, yAxisScale, yMax)
+                plot.yAxis.content(yMin, yAxisScale, yMax)
             }
         }
     }
@@ -320,14 +320,14 @@ private fun getYAxisScale(
     points: List<DataPoint>,
     plot: LinePlot
 ): Triple<Float, Float, Float> {
-    val steps = plot.column.steps
+    val steps = plot.yAxis.steps
     val yMin = points.minOf { it.y }
     val yMax = points.maxOf { it.y }
 
     val totalSteps = (yMax - yMin)
     val temp = totalSteps / if (steps > 1) (steps - 1) else 1
 
-    val scale = if (plot.column.roundToInt) ceil(temp) else temp
+    val scale = if (plot.yAxis.roundToInt) ceil(temp) else temp
     return Triple(yMin, yMax, scale)
 }
 

@@ -20,12 +20,12 @@ import com.madrapps.sample.ui.theme.PlotTheme
 import java.text.DecimalFormat
 
 @Composable
-internal fun LineGraph3(item: List<List<DataPoint>>) {
+internal fun LineGraph3(lines: List<List<DataPoint>>) {
     LineGraph(
         plot = LinePlot(
             listOf(
                 LinePlot.Line(
-                    item[0],
+                    lines[0],
                     LinePlot.Connection(Color.Blue, 2.dp),
                     LinePlot.Intersection(Color.Blue, 4.dp),
                     LinePlot.Highlight(Color.Red, 6.dp),

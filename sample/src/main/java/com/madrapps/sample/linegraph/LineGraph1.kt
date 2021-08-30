@@ -18,19 +18,19 @@ import com.madrapps.sample.ui.theme.LightGreen600
 import com.madrapps.sample.ui.theme.PlotTheme
 
 @Composable
-internal fun LineGraph1(item: List<List<DataPoint>>) {
+internal fun LineGraph1(lines: List<List<DataPoint>>) {
     LineGraph(
         plot = LinePlot(
             listOf(
                 LinePlot.Line(
-                    item[0],
+                    lines[0],
                     LinePlot.Connection(LightGreen600, 2.dp),
                     LinePlot.Intersection(LightGreen600, 5.dp),
                     LinePlot.Highlight(Green900, 5.dp),
                     LinePlot.AreaUnderLine(LightGreen600, 0.3f)
                 ),
                 LinePlot.Line(
-                    item[1],
+                    lines[1],
                     LinePlot.Connection(Color.Gray, 2.dp),
                     LinePlot.Intersection { center, _ ->
                         val px = 2.dp.toPx()
