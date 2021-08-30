@@ -15,7 +15,7 @@ repositories {
 }
 
 dependencies {
-  implementation 'com.github.madrapps:plot:0.1.0'
+  implementation 'com.github.madrapps:plot:0.1.1'
 }
 ```
 
