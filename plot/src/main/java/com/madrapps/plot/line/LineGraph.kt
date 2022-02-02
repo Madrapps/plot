@@ -26,6 +26,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
@@ -54,7 +55,9 @@ import kotlin.math.ceil
  */
 @Composable
 fun LineGraph(
-    plot: LinePlot, modifier: Modifier = Modifier,
+    plot: LinePlot, 
+    modifier: Modifier = Modifier,
+    graphBackgroundColor: Color = MaterialTheme.colors.surface,
     onSelectionStart: () -> Unit = {},
     onSelectionEnd: () -> Unit = {},
     onSelection: ((Float, List<DataPoint>) -> Unit)? = null
@@ -74,7 +77,7 @@ fun LineGraph(
     val xZoom = remember { mutableStateOf(globalXScale) }
     val rowHeight = remember { mutableStateOf(0f) }
     val columnWidth = remember { mutableStateOf(0f) }
-    val bgColor = MaterialTheme.colors.surface
+    val bgColor = graphBackgroundColor
 
     val lines = plot.lines
     val xUnit = plot.xAxis.unit
