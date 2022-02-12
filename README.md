@@ -1,5 +1,5 @@
 # plot
-An android compose library with different Graphs and Charts (*currently supports only Line graph, more types will
+An android compose library with different Graphs and Charts (*currently supports only Line graph and Area graph more types will
 be added soon*)
 
 <img src="/preview/line_graph_recording.gif" alt="Line Graph 1" width="600"/>
