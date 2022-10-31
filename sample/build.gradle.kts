@@ -35,7 +35,6 @@ android {
     }
     kotlinOptions {
         jvmTarget = "1.8"
-        useIR = true
     }
     buildFeatures {
         compose = true
@@ -44,8 +43,8 @@ android {
         kotlinCompilerExtensionVersion = rootProject.extra["kotlinCompilerExtensionVersion"] as String
     }
     lint {
-        isAbortOnError = true
-        isWarningsAsErrors = true
+        abortOnError = true
+        warningsAsErrors = true
     }
     namespace = "com.madrapps.sample"
 }
@@ -68,10 +67,6 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     implementation("androidx.activity:activity-compose:1.6.1")
-
-    /*implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.5.1")
-    implementation("androidx.activity:activity-ktx:1.6.1")
-    implementation("androidx.compose.runtime:runtime-livedata:${rootProject.extra["compose_version"]}")*/
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.3")

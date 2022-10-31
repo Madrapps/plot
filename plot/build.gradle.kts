@@ -48,8 +48,8 @@ android {
         kotlinCompilerExtensionVersion = rootProject.extra["kotlinCompilerExtensionVersion"] as String
     }
     lint {
-        isAbortOnError = true
-        isWarningsAsErrors = true
+        abortOnError = true
+        warningsAsErrors = true
     }
     namespace = "com.madrapps.plot"
 }
