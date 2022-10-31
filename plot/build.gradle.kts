@@ -16,11 +16,11 @@ ext {
 apply(from = "publish.gradle")
 
 android {
-    compileSdk = 30
+    compileSdk = 33
 
     defaultConfig {
         minSdk = 21
-        targetSdk = 30
+        targetSdk = 33
         version = libVersion
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
