@@ -3,8 +3,8 @@ package com.madrapps.sample.linegraph
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,7 +38,7 @@ internal fun LineGraph3(lines: List<List<DataPoint>>) {
                     androidx.compose.foundation.layout.Column {
                         val isMajor = value % 4 == 0f
                         val radius = if (isMajor) 6f else 3f
-                        val color = MaterialTheme.colors.onSurface
+                        val color = MaterialTheme.colorScheme.onSurface
                         Canvas(
                             modifier = Modifier
                                 .align(Alignment.CenterHorizontally)
@@ -55,7 +55,7 @@ internal fun LineGraph3(lines: List<List<DataPoint>>) {
                                 text = DecimalFormat("#.#").format(value),
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
-                                style = MaterialTheme.typography.caption,
+                                style = MaterialTheme.typography.labelMedium,
                                 color = color
                             )
                         }
