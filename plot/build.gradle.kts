@@ -51,6 +51,7 @@ android {
         isAbortOnError = true
         isWarningsAsErrors = true
     }
+    namespace = "com.madrapps.plot"
 }
 
 dependencies {

@@ -47,6 +47,7 @@ android {
         isAbortOnError = true
         isWarningsAsErrors = true
     }
+    namespace = "com.madrapps.sample"
 }
 
 dependencies {
