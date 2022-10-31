@@ -1,5 +1,6 @@
 package com.madrapps.plot
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.calculateCentroidSize
 import androidx.compose.foundation.gestures.calculateZoom
@@ -13,18 +14,15 @@ import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.input.pointer.changedToUpIgnoreConsumed
-import androidx.compose.ui.input.pointer.consumeAllChanges
-import androidx.compose.ui.input.pointer.consumeDownChange
-import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.isOutOfBounds
 import androidx.compose.ui.input.pointer.positionChange
-import androidx.compose.ui.input.pointer.positionChangeConsumed
 import androidx.compose.ui.input.pointer.positionChanged
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.withTimeout
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.math.abs
 
+@SuppressLint("ReturnFromAwaitPointerEventScope", "MultipleAwaitPointerEventScopes")
 @SuppressWarnings("LoopWithTooManyJumpStatements")
 internal suspend fun PointerInputScope.detectDragZoomGesture(
     isZoomAllowed: Boolean = false,
@@ -47,7 +45,7 @@ internal suspend fun PointerInputScope.detectDragZoomGesture(
 
                 do {
                     val event = awaitPointerEvent()
-                    val canceled = event.changes.any { it.positionChangeConsumed() }
+                    val canceled = event.changes.any { it.isConsumed }
                     if (event.changes.size == 1) {
                         break
                     } else if (event.changes.size == 2) {
@@ -72,7 +70,7 @@ internal suspend fun PointerInputScope.detectDragZoomGesture(
                                     }
                                     event.changes.forEach {
                                         if (it.positionChanged()) {
-                                            it.consumeAllChanges()
+                                            it.consume()
                                         }
                                     }
                                 }
@@ -93,13 +91,13 @@ internal suspend fun PointerInputScope.detectDragZoomGesture(
                             if (
                                 drag(drag.id) {
                                     onDrag(it, it.positionChange())
-                                    it.consumePositionChange()
+                                    if (it.positionChange() != Offset.Zero) it.consume()
                                 }
                             ) {
                                 // consume up if we quit drag gracefully with the up
                                 currentEvent.changes.forEach {
                                     if (it.changedToUp()) {
-                                        it.consumeDownChange()
+                                        if (it.pressed != it.previousPressed) it.consume()
                                     }
                                 }
                                 onDragEnd()
@@ -136,7 +134,11 @@ private suspend fun PointerInputScope.awaitLongPressOrCancellation(
                     }
 
                     if (
-                        event.changes.any { it.consumed.downChange || it.isOutOfBounds(size) }
+                        event.changes.any { it.isConsumed || it.isOutOfBounds(
+                            size,
+                            extendedTouchPadding
+                        )
+                        }
                     ) {
                         finished = true // Canceled
                     }
@@ -145,7 +147,7 @@ private suspend fun PointerInputScope.awaitLongPressOrCancellation(
                     // the existing pointer event because it comes after the Main pass we checked
                     // above.
                     val consumeCheck = awaitPointerEvent(PointerEventPass.Final)
-                    if (consumeCheck.changes.any { it.positionChangeConsumed() }) {
+                    if (consumeCheck.changes.any { it.isConsumed }) {
                         finished = true
                     }
                     if (!event.isPointerUp(currentDown.id)) {

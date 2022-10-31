@@ -11,7 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
@@ -74,7 +74,7 @@ fun LineGraph(
     val xZoom = remember { mutableStateOf(globalXScale) }
     val rowHeight = remember { mutableStateOf(0f) }
     val columnWidth = remember { mutableStateOf(0f) }
-    val bgColor = MaterialTheme.colors.surface
+    val bgColor = MaterialTheme.colorScheme.surface
 
     val lines = plot.lines
     val xUnit = plot.xAxis.unit

@@ -9,9 +9,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -69,7 +69,7 @@ internal fun LineGraph4(lines: List<List<DataPoint>>, modifier: Modifier) {
                             Text(
                                 modifier = Modifier.padding(vertical = 8.dp),
                                 text = "Score at $x:00 hrs",
-                                style = MaterialTheme.typography.subtitle1,
+                                style = MaterialTheme.typography.headlineMedium,
                                 color = Color.Gray
                             )
                             ScoreRow("Today", value[1].y, Color.Blue)
@@ -81,7 +81,7 @@ internal fun LineGraph4(lines: List<List<DataPoint>>, modifier: Modifier) {
             }
         }
         val padding = 16.dp
-        MaterialTheme(colors = MaterialTheme.colors.copy(surface = Color.White)) {
+        MaterialTheme(colorScheme = MaterialTheme.colorScheme.copy(surface = Color.White)) {
             LineGraph(
                 plot = LinePlot(
                     listOf(
@@ -150,7 +150,7 @@ private fun ScoreRow(title: String, value: Float, color: Color) {
             )
             Text(
                 text = title,
-                style = MaterialTheme.typography.subtitle1,
+                style = MaterialTheme.typography.headlineMedium,
                 color = Color.DarkGray
             )
         }
@@ -159,7 +159,7 @@ private fun ScoreRow(title: String, value: Float, color: Color) {
                 .padding(end = 8.dp)
                 .align(Alignment.CenterEnd),
             text = formatted,
-            style = MaterialTheme.typography.subtitle2,
+            style = MaterialTheme.typography.headlineSmall,
             color = Color.DarkGray
         )
     }
