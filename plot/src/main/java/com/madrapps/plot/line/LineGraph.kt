@@ -126,7 +126,7 @@ fun LineGraph(
                 onDraw = {
                     val xLeft = columnWidth.value + horizontalGap.toPx()
                     val yBottom = size.height - rowHeight.value
-                    val xOffset = 20.dp.toPx() * xZoom.value
+                    val xOffset = plot.xAxis.stepSize.toPx() * xZoom.value
                     val maxElementInYAxis =
                         getMaxElementInYAxis(yAxisScale, plot.yAxis.steps)
                     val yOffset = ((yBottom - paddingTop.toPx()) / maxElementInYAxis) * globalYScale
